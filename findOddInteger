@@ -1,0 +1,19 @@
+function findOddInteger(A) {
+  let elementsObject = {}; 
+  
+  A.forEach(el => { 
+  if (elementsObject.hasOwnProperty(el)) {
+    elementsObject[el]++; 
+  } else {
+    elementsObject[el] = 1; 
+  }
+    }); 
+
+    for (let el in elementsObject) {
+      if (elementsObject[el] % 2 === 1) {
+        return parseInt(el); 
+      } else {
+        console.log("Not odd..."); 
+      }
+    }
+  }

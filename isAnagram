@@ -1,0 +1,17 @@
+var isAnagram = function(test, original) {
+  if (test.length === original.length) {
+    console.log('Lengths match. Proceed.');
+    let sortedTest, sortedOriginal;
+    sortedTest = Array.from(test.toLowerCase().split('')).sort().join();
+    sortedOriginal = Array.from(original.toLowerCase().split('')).sort().join();
+    console.log(sortedTest, sortedOriginal); 
+    if (sortedTest === sortedOriginal) {
+      return true
+    } else {
+      return false; 
+    }
+  } else {
+  console.log('Lengths do not match. Fail.')
+  return false; 
+}
+};

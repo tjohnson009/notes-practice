@@ -1,0 +1,17 @@
+function squareEveryDigit(num){
+  if (num >= 0) {
+  // convert to string
+  // separate on ''
+  // put all numbers into an array
+    let stringArray = num.toString().split(''); 
+    
+    let finalString = ''; 
+  //for each, square each parsed element, stringify it, put it into a final string
+  stringArray.forEach((el) => {
+       finalString = finalString.concat(((parseInt(el))**2).toString()); 
+  })
+    
+    return parseInt(finalString); //parse the final string to an integer
+  
+  }
+}
