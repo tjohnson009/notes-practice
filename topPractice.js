@@ -15,4 +15,13 @@ container.appendChild(h3);
 // another <h1> that says “I’m in a div”
 // a <p> that says “ME TOO!”
 // Hint for this one: after creating the <div> with createElement, append the <h1> and <p> to it before adding it to the container.
-
+const div = document.createElement('div'); 
+// div.style.backgroundColor = 'pink';
+div.setAttribute('style', 'border: black 5px solid; background-color: pink; ');  
+const h1 = document.createElement('h1'); 
+h1.textContent = `I'm in a div`; 
+const newP = document.createElement('p'); 
+newP.textContent = `ME TOO`; 
+div.appendChild(h1); 
+div.appendChild(newP);
+container.appendChild(div); 
