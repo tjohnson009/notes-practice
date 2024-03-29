@@ -114,3 +114,46 @@ OPTION 3:
 #closet {
   grid-area: closet;
 }
+
+SUBGRIDS
+In addition to regular grids, subgrid lets us create nested grids that use the track definition of the parent grid.
+grid-template-columns: subgrid. The nested grid then use the parent grid tracks to lay out items.
+
+.box1 {
+  grid-column-start: 1;
+  grid-column-end: 4;
+  grid-row-start: 1;
+  grid-row-end: 3;
+  display: grid;
+  grid-template-columns: subgrid;
+}
+
+STRETCHING THE WHOLE GRID
+.item {
+  grid-column: 1 / -1;
+}
+
+SPAN 
+.box1 {
+  grid-column: 1;
+  grid-row: 1 / span 3; // 3 grids occupied
+}
+.box2 {
+  grid-column: 3;
+  grid-row: 1 / span 2;
+}
+______________________
+
+.box1 {
+  grid-column-start: 1;
+  grid-row-start: span 3;
+  grid-row-end: 4;
+}
+
+Remember that if you do not place all of the items, any leftover items will be placed according to auto-placement rules.
+
+BOX ALIGNMENT
+When working with grid layout you have two axes available to align things against – 
+the block axis - VERTICAL
+and the inline axis - HORIZONTAL
+They bothh take a lot of the same values as flexbox. 
