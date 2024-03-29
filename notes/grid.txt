@@ -1,0 +1,116 @@
+CSS Grid also includes a shorthand property for defining rows and columns. In our previous example we can replace the properties for grid-template-rows and grid-template-columns with the shorthand grid-template property.
+
+.container {
+  display: grid;
+  grid-template: 50px 50px / 50px 50px 50px;
+  OR 
+  grid-template-rows: 50px 50px; 
+  grid-template-columns: 50px 50px 50px; 
+}
+
+When we use the grid-template-columns and grid-template-rows properties, we are explicitly defining grid tracks to lay out our grid items. But when the grid needs more tracks for extra content, it will implicitly define new grid tracks. Additionally, the size values established from our grid-template-columns or grid-template-rows properties are NOT carried over into these implicit grid tracks. But we can define values for the implicit grid tracks.
+We can set the implicit grid track sizes using the grid-auto-rows and grid-auto-columns properties.
+By default, CSS Grid will add additional content with implicit rows. Use the grid-auto-flow property to set the implicit grid flow direction. 
+
+
+Whenever we create grid tracks, grid lines are created implicitly. Grid lines are what we use to position grid items.
+
+<div class="container">
+  <div class="room" id="living-room">Living Room</div>
+  <div class="room" id="kitchen">Kitchen</div>
+  <div class="room" id="bedroom">Bedroom</div>
+  <div class="room" id="bathroom">Bathroom</div>
+  <div class="room" id="closet">Closet</div>
+</div>
+
+OPTION 1: 
+.container {
+  display: inline-grid;
+  grid-template: 40px 40px 40px 40px 40px / 40px 40px 40px 40px 40px;
+  background-color: lightblue; 
+}
+
+.room {
+  border: 1px solid;
+  font-size: 50%;
+  text-align: center;
+}
+
+#living-room {
+  grid-column: 1 / 6;
+  grid-row: 1 / 3;
+}
+
+#kitchen {
+  grid-column: 4 / 6;
+  grid-row: 3 / 6;
+}
+
+#bedroom {
+  grid-column-start: 2;
+  grid-column-end: 4;
+  grid-row-start: 3;
+  grid-row-end: 5;
+}
+
+#bathroom {
+  grid-column-start: 1;
+  grid-column-end: 2;
+  grid-row-start: 3;
+  grid-row-end: 6;
+}
+
+#closet {
+  grid-column-start: 2;
+  grid-column-end: 4;
+  grid-row-start: 5;
+  grid-row-end: 6;
+}
+
+OPTION 2: 
+You can combine grid-row-start / grid-column-start / grid-row-end / grid-column-end into one line using grid-area.
+#living-room {
+    rowstart/columnstart/rowend/columnend
+  grid-area: 1 / 1 / 3 / 6;
+}
+
+OPTION 3: 
+.container {
+  display: inline-grid;
+  grid-template: 40px 40px 40px 40px 40px / 40px 40px 40px 40px 40px;
+  background-color: lightblue; 
+  grid-template-areas: ***
+    "living-room living-room living-room living-room living-room"
+    "living-room living-room living-room living-room living-room"
+    "bedroom bedroom bathroom kitchen kitchen"
+    "bedroom bedroom bathroom kitchen kitchen"
+    "closet closet bathroom kitchen kitchen"    
+
+    utilize . to have empty space
+}
+
+.room {
+  border: 1px solid;
+  font-size: 50%;
+  text-align: center;
+}
+
+#living-room {
+   grid-area:  living-room;
+}
+
+#kitchen {
+  grid-area: kitchen;
+}
+
+#bedroom {
+  grid-area: bedroom;
+}
+
+#bathroom {
+  grid-area: bathroom;
+}
+
+#closet {
+  grid-area: closet;
+}

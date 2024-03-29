@@ -1,0 +1,43 @@
+The single most important lesson you can learn about website security is to never trust data from the browser.
+The best defense against XSS vulnerabilities is to remove or disable any markup that can potentially contain instructions to run the code. For HTML this includes elements, such as <script>, <object>, <embed>, and <link>.
+pattern attribute, which expects a Regular Expression as its value.
+
+input:invalid {
+  border-color: red;
+}
+
+input:valid {
+  border-color: green;
+}
+
+It’s always a good idea to have a mockup representing the exact page you want to build before you start coding it up, but this is particularly true for forms.
+<select>, <textarea>, <meter>, and <progress>.
+<meter min="0" max="100" value="75" low="33" high="66" optimum="0">75</meter>
+
+<datalist id="mySuggestion">
+  <option>Apple</option>
+  <option>Banana</option>
+  <option>Blackberry</option>
+  <option>Blueberry</option>
+  <option>Lemon</option>
+  <option>Lychee</option>
+  <option>Peach</option>
+  <option>Pear</option>
+</datalist>
+
+AUTOCOMPLETE feature
+
+<select id="groups" name="groups">
+  <optgroup label="fruits">
+    <option>Banana</option>
+    <option selected>Cherry</option>
+    <option>Lemon</option>
+  </optgroup>
+  <optgroup label="vegetables">
+    <option>Carrot</option>
+    <option>Eggplant</option>
+    <option>Potato</option>
+  </optgroup>
+</select>
+
+hidden input type. This is used to create a form control that is invisible to the user, but is still sent to the server along with the rest of the form data once submitted
