@@ -157,3 +157,79 @@ When working with grid layout you have two axes available to align things agains
 the block axis - VERTICAL
 and the inline axis - HORIZONTAL
 They bothh take a lot of the same values as flexbox. 
+
+resize: both:  
+This is a property that allows the user to resize the container by clicking and dragging from the bottom right corner. 
+
+We use overflow: auto to enable scrolling if we resize the container to be smaller than our grid can accommodate.
+
+REPEAT
+repeat() is a CSS function available to the CSS Grid template properties that allows us to define a number of rows or columns and the size we want them to be without having to manually type out each individual track’s size.
+
+FR UNIT
+The fr unit is a way of distributing whatever remaining space is left in the grid. 
+  grid-template-rows: repeat(2, 1fr);
+  grid-template-columns: repeat(2, 2fr) repeat(3, 1fr); // 2fr 2fr 1fr 1fr 1fr 
+
+  MIN & MAX
+  .grid-container {
+  grid-template-rows: repeat(2, min(200px, 50%));
+  grid-template-columns: repeat(5, max(120px, 15%));
+}
+
+minmax() is a CSS function that is specifically used with Grid. It can ONLY be used with the following CSS properties:
+grid-template-columns
+grid-template-rows
+grid-auto-columns
+grid-auto-rows
+
+CLAMP 
+clamp() is a CSS function that can be used anywhere; 
+clamp(minimum-size (typically static), ideal-size (dynamic), maximum-size(typically static))
+
+.grid-container {
+  grid-template-columns: repeat(5, clamp(150px, 20%, 200px));
+}
+
+Using clamp() and minmax() are fantastic methods for making grids more responsive while ensuring we don’t hit critical breakpoints that make our website look bad. 
+
+AUTO-FIT and AUTO-FILL:
+both of these functions will return “the largest possible positive integer” without the grid items overflowing their container.
+
+AUTO-FIT
+.example {
+  display: grid;
+  width: 1000px;
+  grid-template-columns: repeat(auto-fit, 200px);
+}
+The real magic of auto-fit and auto-fill comes when we incorporate minmax() into the equation. 
+So what’s going on here specifically with repeat(auto-fit, minmax(150px, 1fr));? Remember that auto-fit will return the highest positive integer without overflowing the grid. 
+So first, the browser has to know how wide our grid is: in this case, it’s just the window’s width (minus margins) because we didn’t explicitly set it. 
+For the sake of this example, let’s pretend like our window is currently 500px wide. Second, the browser needs to know how many grid column tracks could possibly fit in that width. 
+To do this, it uses the minimum value in our minmax() function, since that will yield the highest number of items, which is 150px. If our window is 500px wide, this means our grid will render 3 columns. 
+But wait, there’s more! Once the browser has determined how many columns we can fit, it then resizes our columns up to the maximum value allowed by our minmax() function. 
+In this case, our max size is 1fr, so all three columns will be given an equal allotment of the space available. As we resize our window, these calculations happen in realtime and the result is what you see in the above example!
+
+In most cases, auto-fill is going to work exactly the same way as auto-fit:
+When the grid is expanded to a size where another grid item could fit, but there aren’t any left, auto-fit will keep the grid items at their max size. 
+Using auto-fill, the grid items will snap back down to their min size once the space becomes available to add another grid item, even if there isn’t one to be rendered.
+
+grid-template-columns: 
+  repeat(auto-fit, minmax(250px, 1fr));
+
+  .container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: masonry;
+}
+
+More specifically, our ability to specify how many columns we want in the grid and then letting the browser handle the responsiveness of those columns for us, 
+showing fewer columns on smaller viewport sizes, and more columns as the screen estate allows for more, without needing to write a single media query to dictate this responsive behavior.
+
+**** auto-fill FILLS the row with as many columns as it can fit. So it creates implicit columns whenever a new column can fit, because it’s trying to FILL the row with as many columns as it can. The newly added columns can and may be empty, but they will still occupy a designated space in the row.
+**** auto-fit FITS the CURRENTLY AVAILABLE columns into the space by expanding them so that they take up any available space. The browser does that after FILLING that extra space with extra columns (as with auto-fill ) and then collapsing the empty ones.
+
+grid-template-columns: repeat( auto-fit, minmax(250px, 1fr) );
+
+Content first vs layout first design
+A way to decide between Grid and Flexbox is to consider if your design starts from the content, or from the layout.
