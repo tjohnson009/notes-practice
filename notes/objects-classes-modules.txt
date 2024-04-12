@@ -1,0 +1,260 @@
+ you cannot use variables in dot notation!
+
+const variable = 'property';
+    myObject.variable; // this gives us 'undefined' because it's looking for a property named 'variable' in our object
+    myObject[variable]; // this is equivalent to myObject['property'] and returns 'Value!'
+
+    OBJECT CONSTRUCTOR
+    function Player(name, marker) {
+     this.name = name;
+     this.marker = marker;
+}
+
+const player = new Player('steve', 'X');
+console.log(player.name); // 'steve'
+
+All objects in JavaScript have a prototype. The prototype is another object that the original object inherits from,
+ which is to say, the original object has access to all of its prototype’s methods and properties.
+
+ any properties or methods defined on Player.prototype will be available to the created Player objects!
+
+ Player.prototype.sayHello = function() {
+   console.log("Hello, I'm a player!");
+};
+
+player1.sayHello(); // logs "Hello, I'm a player!"
+player2.sayHello(); // logs "Hello, I'm a player!"
+
+.__proto__ is deprecated now but it works the same.
+
+WHAT USE IS AN OBJECTS PROTOTYPE?
+1. We can define properties and functions common among all objects on the prototype to save memory. 
+2. Prototypal Ineritance
+
+PROTOTYPAL INHERITANCE
+prototypical inheritance differs from class inheritance??
+
+Prototypal inheritance involves creating objects based on other objects. Each object has a prototype, and if a property or
+method is not found on the object itself, JavaScript looks up the prototype chain until it finds the property or method.
+Prototypal inheritance is more flexible and dynamic than class-based inheritance, as objects can inherit from multiple prototypes 
+(using a technique called "mixins") and can have their prototype changed at runtime.
+Prototype properties and methods are NOT automatically linked when you use call() to chain constructors. 
+player1.hasOwnProperty('valueOf'); // false
+Object.prototype.hasOwnProperty('valueOf'); // true
+player1.valueOf() is inherited from the player1 Prototype which inherited it from Object.prototype
+
+Prototype Chain
+When we read a property from object, and it’s missing, JavaScript automatically takes it from the prototype. 
+In programming, this is called “prototypal inheritance”. 
+Object.getPrototypeOf(Object.prototype): null, which indicates the end of the chain. 
+Every prototype object inherits from Object.prototype by default.
+An object’s Object.getPrototypeOf() value can only be one unique prototype object.
+
+*** Just as we use Object.getPrototypeOf() to ‘get’ or view the prototype of an object, we can use Object.setPrototypeOf() 
+to ‘set’ or mutate it.
+
+function Person(name) {
+  this.name = name;
+}
+Person.prototype.sayName = function() {
+  console.log(`Hello, I'm ${this.name}!`);
+};
+function Player(name, marker) {
+  this.name = name;
+  this.marker = marker;
+}
+Player.prototype.getMarker = function() {
+  console.log(`My marker is '${this.marker}'`);
+};
+Object.getPrototypeOf(Player.prototype); // returns Object.prototype
+// Now make `Player` objects inherit from `Person`
+Object.setPrototypeOf(Player.prototype, Person.prototype);
+Object.getPrototypeOf(Player.prototype); // returns Person.prototype
+const player1 = new Player('steve', 'X');
+const player2 = new Player('also steve', 'O');
+player1.sayName(); // Hello, I'm steve!
+player2.sayName(); // Hello, I'm also steve!
+player1.getMarker(); // My marker is 'X'
+player2.getMarker(); // My marker is 'O'
+
+Though it seems to be an easy way to set up Prototypal Inheritance using Object.setPrototypeOf(), the prototype chain has 
+to be set up using this function before creating any objects. Using setPrototypeOf() after objects have already been created 
+can result in performance issues.
+
+DOES NOT WORK 
+Player.prototype = Person.prototype;
+
+example: function Person(name) {
+  this.name = name;
+}
+Person.prototype.sayName = function() {
+  console.log(`Hello, I'm ${this.name}!`);
+};
+function Player(name, marker) {
+  this.name = name;
+  this.marker = marker;
+}
+// Don't do this!
+// Use Object.setPrototypeOf(Player.prototype, Person.prototype)
+Player.prototype = Person.prototype;
+function Enemy(name) {
+  this.name = name;
+  this.marker = '^';
+}
+// Not again!
+// Use Object.setPrototypeOf(Enemy.prototype, Person.prototype)
+Enemy.prototype = Person.prototype;
+Enemy.prototype.sayName = function() {
+  console.log('HAHAHAHAHAHA');
+};
+const carl = new Player('carl', 'X');
+carl.sayName(); // Uh oh! this logs "HAHAHAHAHAHA" because we edited the sayName function!
+
+function Warrior(name, level, weapon) {
+  Hero.call(this, name, level);
+  this.weapon = weapon;
+}
+function Healer(name, level, spell) {
+  Hero.call(this, name, level);
+  this.spell = spell;
+}
+// Link prototypes and add prototype methods
+Object.setPrototypeOf(Warrior.prototype, Hero.prototype);
+Object.setPrototypeOf(Healer.prototype, Hero.prototype);
+Hero.prototype.greet = function () {
+  return `${this.name} says hello.`;
+}
+Warrior.prototype.attack = function () {
+  return `${this.name} attacks with the ${this.weapon}.`;
+}
+Healer.prototype.heal = function () {
+  return `${this.name} casts ${this.spell}.`;
+}
+// Initialize individual character instances
+const hero1 = new Warrior('Bjorn', 1, 'axe');
+const hero2 = new Healer('Kanin', 1, 'cure');
+
+"this" is not affected by prototypes at all.
+// animal has methods
+let animal = {
+  walk() {
+    if (!this.isSleeping) {
+      alert(`I walk`);
+    }
+  },
+  sleep() {
+    this.isSleeping = true;
+  }
+};
+let rabbit = {
+  name: "White Rabbit",
+  __proto__: animal
+};
+// modifies rabbit.isSleeping
+rabbit.sleep();
+alert(rabbit.isSleeping); // true
+alert(animal.isSleeping); // undefined (no such property in the prototype)
+
+ARROW FUNCTIONS 
+The arrow function in JavaScript is anonymous: the name property of the function is an empty string ''.
+
+const increaseNumber = number => number + 1;
+increaseNumber.name; // => 'increaseNumber'  BEST PRACTICE
+
+const array = [1, 2, 3];
+
+// Works!
+array.map(number => ({ 'number': number }));
+
+***Classes are only syntactical sugar for constructor functions. Everything still works the same way!
+
+Object.create() helps you extend an object constructor 
+
+CLASSES - this is what we would do before classes: now classes are "syntactical sugar" (it looks nicer, 
+but basically the same thing)
+function Animal (name, energy) {
+  // const this = Object.create(Animal.prototype)
+  this.name = name
+  this.energy = energy
+  // return this
+}
+const leo = new Animal('Leo', 7)
+const snoop = new Animal('Snoop', 10)
+
+function Animal (name, energy) {
+  this.name = name
+  this.energy = energy
+}
+Animal.prototype.eat = function (amount) {
+  console.log(`${this.name} is eating.`)
+  this.energy += amount
+}
+Animal.prototype.sleep = function (length) {
+  console.log(`${this.name} is sleeping.`)
+  this.energy += length
+}
+Animal.prototype.play = function (length) {
+  console.log(`${this.name} is playing.`)
+  this.energy -= length
+}
+const leo = new Animal('Leo', 7)
+const snoop = new Animal('Snoop', 10)
+
+STATIC METHODS
+Whenever you have a method that is specific to a class itself, but doesn’t need to be shared 
+across instances of that class, you can add it as a static property of the class.
+
+class Animal {
+  constructor(name, energy) {
+    this.name = name
+    this.energy = energy
+  }
+  eat(amount) {
+    console.log(`${this.name} is eating.`)
+    this.energy += amount
+  }
+  sleep(length) {
+    console.log(`${this.name} is sleeping.`)
+    this.energy += length
+  }
+  play(length) {
+    console.log(`${this.name} is playing.`)
+    this.energy -= length
+  }
+  static nextToEat(animals) {
+    const sortedByLeastEnergy = animals.sort((a,b) => {
+      return a.energy - b.energy
+    })
+    return sortedByLeastEnergy[0].name
+  }
+} - Now, because we added nextToEat as a static property on the class, 
+it lives on the Animal class itself (not its prototype) and can be 
+accessed using Animal.nextToEat.
+
+THIS 
+"this" is referring to whatever object is executing or calling the current function. 
+A rule of thumb is to go to the function call and look immediately to the left of it, 
+whatever object is there (including the window object) is "this". 
+****Arrow Functions DO NOT have their own 'this' scope. An arrow function will inherit the 'this' 
+scope of the nearest surrounding non-arrow FUNCTION. If no surrounding function scope is there, it will go to the globak scope. 
+Example:
+const user = {
+    firstName: 'Tim',
+    lastName: 'Thompson', 
+    fullName: () => {
+        console.log(this.firstName + ' ' + this.lastName)
+    }
+}
+user.fullName() => undefined 
+This works though because the arrow function takes the scope of the fullName regular function. 
+const user = {
+    firstName: 'Tim',
+    lastName: 'Thompson', 
+    fullName: function() {
+
+        const arrowFunction = () => {
+        console.log(this.firstName + ' ' + this.lastName)
+        }
+    }
+}
+user.fullName() => Tim Thompson 
