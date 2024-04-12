@@ -1,4 +1,4 @@
- you cannot use variables in dot notation!
+you cannot use variables in dot notation!
 
 const variable = 'property';
     myObject.variable; // this gives us 'undefined' because it's looking for a property named 'variable' in our object
