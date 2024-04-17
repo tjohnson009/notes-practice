@@ -1,0 +1,359 @@
+SCOPE 
+outside of curly braces? global scope
+inside curly braces? local scope
+var variables are not block scoped, they are function scoped. "var" was function scoped by default 
+but it's functionality can be extended to be similar to block scoping; Scope answers the question 
+"where are my variables and functions available to me?"
+
+That is what is referred to as shadow variables. You can name variables the same thing, if they are 
+not in the same scope. If you ever wanted to access the outer variable you can't do it, so this is not
+wise. 
+
+Block scoping is one of the reasons people say use const by default, let when you want to re-assign it 
+and don't use var unless there is a specific use case for it.
+
+const dog = 'snickers';
+function logDog() {
+  console.log(dog);
+}
+function go() {
+  const dog = 'sunny';
+  logDog();
+}
+go(); // snickers ... but why!?
+
+-- LEXICAL and STATIC SCOPING
+This means is the way that variable look-up or scope look-up happens, is where the functions
+ are defined, not where they are run. So even though the logDog() function is run inside of another 
+ function which has a locally scoped dog variable, it doesn't care about where it's run, it cares 
+ about where it is defined.
+
+-- Best Practices
+Try not to create global variables
+it is fine for us to create them while doing these examples and when we get into modules, it is almost impossible to create global variables unless you explicitly do something like window.IAMGlobal = 'wes'.
+Unless you explicitly attach it to the window, with a module, it is very hard to create a global variable which is intentional.
+Functions are scoped the exact same as variables
+You can create functions inside of other functions. We will look at examples of why you might want to do that later.
+
+-- CLOSURES
+function makeAdding (firstNumber) {
+  // "first" is scoped within the makeAdding function
+  const first = firstNumber;
+  return function resulting (secondNumber) {
+    // "second" is scoped within the resulting function
+    const second = secondNumber;
+    return first + second;
+  }
+}
+// but we've not seen an example of a "function"
+// being returned, thus far - how do we use it?
+
+const add5 = makeAdding(5);
+console.log(add5(2)) // logs 7
+
+Functions in JavaScript form closures. A closure refers to the combination of a function 
+and the surrounding state (lexical environment) in which the function was declared. This is a crucial 
+behavior of functions - allowing us to associate data with functions and manipulate that data anywhere 
+outside of the enclosing function.  
+In other words, a closure gives you access to an outer function's scope from an inner function. In JavaScript, 
+closures are created EVERY time a function is created, at function creation time.
+- black hole analogy - a little string connected to what was previously there
+
+Code blocks are finally treated as scopes in ES6, but only if you declare variables with let or const
+
+function makeAdder(x) {
+  return function (y) {
+    return x + y;
+  };
+}
+const add5 = makeAdder(5);
+const add10 = makeAdder(10);
+console.log(add5(2)); // 7
+console.log(add10(2)); // 12
+
+In this example, we have defined a function makeAdder(x), that takes a single argument x, and returns a new function.
+In essence, makeAdder is a FUNCTION FACTORY. It creates functions that can add a specific value to their argument. 
+In the above example, the function factory creates two new functions—one that adds five to its argument, and one that adds 10.
+add5 and add10 both form closures. 
+
+Closures are useful because they let you associate data (the lexical environment) with a function that operates on that data.
+You can use a closure anywhere that you might normally use an object with only a single method.
+
+function makeSizer(size) {
+  return function () {
+    document.body.style.fontSize = `${size}px`;
+  };
+}
+
+const size12 = makeSizer(12);
+const size14 = makeSizer(14);
+const size16 = makeSizer(16);
+
+size12, size14, and size16 are now functions that resize the body text to 12, 14, and 16 pixels, respectively. 
+
+What you can do is stick a function into a variable, and then at a later point in time, you can have access to that function. 
+A closure comes into play because you can access the function even though the outer function is done.
+We learned in scoping that when a function is done, anytime there are scoped variables that aren't returned from the function,
+they are not accessible. Now we get this weird thing where when we run the function outside of it, it's still able to access it. 
+That is what is referred to as a closure.
+
+JavaScript is able to create functions inside of functions, and it can still reach outside to the parent scope, and even though 
+the outer function is done running, it will still maintain that variable in memory so that we can then access it at a later time.
+
+One of the key arguments against constructors, in fact, the biggest argument is how they look like regular JavaScript functions, 
+even though they do not behave like regular functions. If you try to use a constructor function without the new keyword, not only 
+does your program fail to work, but it also produces error messages that are hard to track down and understand. This and other problems
+led to the use of Factory Functions. 
+Yet another issue stems from the way the instanceof works. It checks the presence of a constructor’s prototype in an object’s entire prototype chain 
+- which does nothing to confirm if an object was made with that constructor since the constructor’s prototype can even be reassigned after the creation 
+of an object.
+
+Examples:
+function createGreeting(greeting = "") {
+  const myGreet = greeting.toUpperCase();
+  return function(name) {
+    return `${myGreet} ${name}`;
+  };
+}
+const sayHello = createGreeting('hello'); //f(x)(name)
+const sayHey = createGreeting('hey'); //f(x)(name)
+console.log(sayHello('wes')); // HELLO wes
+console.log(sayHello('kait')); // HELLO kait
+console.log(sayHey('kait')); // HEY kait
+
+Since our inner scope references a variable that was created in our outer scope, that is what is referred to as closure.
+
+const Player = (name, level) => {
+    let health = level * 2;
+    const getLevel = () => level;
+    const getName  = () => name;
+    const die = () => {
+      // uh oh
+    };
+    const damage = x => {
+      health -= x;
+      if (health <= 0) {
+        die();
+      }
+    };
+    const attack = enemy => {
+      if (level < enemy.getLevel()) {
+        damage(1);
+        console.log(`${enemy.getName()} has damaged ${name}`);
+      }
+      if (level >= enemy.getLevel()) {
+        enemy.damage(1);
+        console.log(`${name} has damaged ${enemy.getName()}`);
+      }
+    };
+    return {attack, damage, getLevel, getName}; // exposed
+  };
+  
+  const jimmie = Player('jim', 10);
+  const badGuy = Player('jeff', 5);
+  jimmie.attack(badGuy);
+
+  jimmie.die(); // undefined because we did not expose die()
+  health++ // undefined bec ause we did not expose this variable
+
+-- FACTORY FUNCTIONS
+Factory functions set up and return the new object when you call the function.
+In JavaScript, any function can create new objects. When it’s not a constructor function, it’s called a factory function. 
+const proto = {
+  hello () {
+    return `Hello, my name is ${ this.name }`;
+  }
+};
+const greeter = (name) => Object.assign(Object.create(proto), {
+  name
+});
+const george = greeter('george');
+const msg = george.hello();
+console.log(msg);
+
+const proto = {
+  hello: function hello() {
+    return `Hello, my name is ${ this.name }`;
+  }
+};
+const george = Object.assign({}, proto, {name: 'George'});
+const msg = george.hello();
+console.log(msg); // Hello, my name is George
+
+const User = function(name) {
+  this.name = name;
+  this.discordName = "@" + name;
+}
+// hey, this is a constructor - then this can be refactored into a factory!
+
+   function createUser(name) {
+  const discordName = "@" + name;
+  return { name, discordName }; 
+}
+// and that's very similar, except since it's just a function,
+// we don't need a new keyword
+
+Factory functions eliminate the need for "new", avoid creating false links between objects and functions, and provide
+ clearer code organization without the pretense of class-like structures.
+
+__________________________
+
+ASIDE - // Try wrapping it in some { curly braces } now,
+// which makes it an object!
+console.log( { name, age, color } );
+// now it logs as - { name: "Bob", age: 28, color: "red" }
+
+DESTRUCTURING - 
+const obj = { a: 1, b: 2 };
+const { a, b } = obj;
+// This creates two variables, a and b,
+// which are equivalent to
+// const a = obj.a;
+// const b = obj.b;
+
+const array = [1, 2, 3, 4, 5];
+const [ zerothEle, firstEle ] = array;
+// This creates zerothEle and firstEle, both of which point
+// to the elements in the 0th and 1st indices of the array
+
+__________________________
+-- PRIVATE VARIABLES AND FUNCTIONS
+function createUser(name) {
+  const discordName = "@" + name;
+
+  let reputation = 0;
+  const getReputation = () => reputation;
+  const giveReputation = () => reputation++;
+
+  return { name, discordName, getReputation, giveReputation };
+}
+
+const josh = createUser("josh");
+josh.giveReputation();
+josh.giveReputation();
+
+console.log({
+  discordName: josh.discordName,
+  reputation: josh.getReputation()
+});
+// logs { discordName: "@josh", reputation: 2 }
+
+Notice that the object we return in the factory function does not contain the 
+reputation variable itself, nor any copy of its value - it can only be accessed via the closures we defined.
+
+Concerning factory functions, a private variable or function uses closures to create
+ smaller, dedicated variables and functions within a factory function itself - things 
+ that we do not need to return in the object itself. This way we can create neater code, 
+ without polluting the returned object with unnecessary variables that we create while 
+ creating the object itself. We expose the necessary details in the form of getReputation 
+ and giveReputation.
+
+ function createGame(gameName){
+  let score = 0;
+  return function win(){
+    score ++;
+    return `Your name ${gameName} score is ${score}`
+  }
+}
+const hockeyGame = createGame('Hockey');
+What is happening there is the function that we create is called win(), and we are using a score variable.
+So whenever we create the game, we create an empty score variable. And then the inner function, whenever 
+we actually run it, will increment the score variable that is of the outer scope. Why is that helpful?
+That allows you to maintain multiple games at once! 
+
+const soccerGame = createGame('Soccer');
+
+Even though the score variable 👆 is the same variable name, because we have created two separate win() 
+functions by using the createGame() function, they each have their own private variable score.
+Currently there is no way for us to access score. If you try to access it in the console, you will 
+get an error saying score is not defined. There is no way for us to access that unless we were to 
+explicitly return that variable or as we did in this example, by putting it into a string.
+
+
+ -- PROTOTYPAL INHERITANCE 
+ function createPlayer(name, level) {
+  const { getReputation, giveReputation } = createUser(name);
+
+  const increaseLevel = () => level++;
+  return { name, getReputation, giveReputation, increaseLevel };
+}
+
+You can create your User, extract what you need from it, and re-return whatever you want to 
+- hiding the rest as some private variables or functions!
+Another way if you only wanted to extend User instead of only using some properties. 
+function createPlayer (name, level) {
+  const user = createUser(name);
+
+  const increaseLevel = () => level++;
+  return Object.assign({}, user, { increaseLevel });
+}
+
+Example: 
+const Person = (name) => {
+    const sayName = () => console.log(`my name is ${name}`);
+    return {sayName};
+  }
+  
+  const Nerd = (name) => { // inheirts some of the functionality
+    const {sayName} = Person(name); // inheriting sayName
+    const doSomethingNerdy = () => console.log('nerd stuff');
+    return {sayName, doSomethingNerdy};
+  }
+  
+  const jeff = Nerd('jeff');
+  
+  jeff.sayName();
+  jeff.doSomethingNerdy(); 
+
+  const Nerd = (name) => { // inherits all the functionality
+    const prototype = Person(name);
+    const doSomethingNerdy = () => console.log('nerd stuff');
+    return Object.assign({}, prototype, {doSomethingNerdy}); // copies the properties from one or more source objects to a target object
+  }
+
+
+-- IIFEs - The module pattern (but they are NOT ES6 modules!)
+The pattern of wrapping a factory function inside an IIFE is called the module pattern.
+
+const calculator = (function () { // wrapping the factory in an IIFE
+  const add = (a, b) => a + b;
+  const sub = (a, b) => a - b;
+  const mul = (a, b) => a * b;
+  const div = (a, b) => a / b;
+  return { add, sub, mul, div };
+})();
+
+calculator.add(3,5); // 8
+calculator.sub(6,2); // 4
+calculator.mul(14,5534); // 77476
+
+This is great for encapsulation and namespacing (not having duplicate names); 
+Take the calculator example into consideration. It’s very easy to imagine a scenario where 
+you can accidentally create multiple functions with the name add. What does add do - does it 
+add two numbers? Strings? Does it take its input directly from the DOM and display the result?
+What would you name the functions that do these things? Instead, we can easily encapsulate 
+them inside a module called calculator which generates an object with that name, allowing us
+to explicitly call calculator.add(a, b) or calculator.sub(a, b).
+
+**Practical Example: 
+const Formatter = (function() {
+  const log = (message) => console.log(`[${Date.now()}] Logger: ${message}`);
+  const makeUppercase = (text) => {
+    log("Making uppercase");
+    return text.toUpperCase();
+  };
+  const writeToDOM = (selector, message) => {
+    document.querySelector(selector).innerHTML = message;
+  }
+  return {
+    makeUppercase,
+    writeToDOM,
+  }
+})();
+
+Formatter.writeToDOM("#target", "Hi there");
+
+"Module pattern is a very common one, and – as you can see – very good at that. 
+I often try to write modules first, then – if needed – classes."
+
+
