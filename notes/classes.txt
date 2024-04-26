@@ -320,12 +320,13 @@ The problem is called "losing this". There are two approaches to fixing it, as d
 1. Pass a wrapper-function, such as setTimeout(() => button.click(), 1000).
 2. Bind the method to object, e.g. in the constructor.
 
+“Class fields” is a syntax that allows to add any properties.
 Class fields provide another, quite elegant syntax:
 class Button {
   constructor(value) {
     this.value = value;
   }
-  click = () => {
+  click = () => { // class field
     alert(this.value);
   }
 }
@@ -517,4 +518,7 @@ class Subclass extends ClassWithPrivateStaticMethod {}
 console.log(Subclass.publicStaticMethod()); // TypeError: Cannot read private member 
 #privateStaticMethod from an object whose class did not declare it
 
-
+ *** Private properties get created by using a hash # prefix and cannot be legally referenced 
+ outside of the class. The privacy encapsulation of these class properties is enforced by 
+ JavaScript itself. The only way to access a private property is via dot notation, and you 
+ can only do so within the class that defines the private property.

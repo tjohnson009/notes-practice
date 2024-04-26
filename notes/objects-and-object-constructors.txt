@@ -281,6 +281,12 @@ const barker = (state) => ({
   bark: () => console.log('WOOF WOOF); 
 })
 
+EXAMPLE:
+onst murderRobotDog = (name) => {
+let state = {...}; 
+return Object.assign({}, barker(state), driver(state), killer(state))
+}
+
 The idea of composition over inheritance is a principle in software design that suggests favoring building 
 complex objects or behaviors by combining simpler parts rather than relying heavily on inheritance. Let's 
 break it down with a simple example in JavaScript:
