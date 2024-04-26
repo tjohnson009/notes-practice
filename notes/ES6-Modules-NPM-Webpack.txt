@@ -1,0 +1,257 @@
+A JavaScript module bundler is a tool that gets around the problem with a build step (which has 
+access to the file system) to create a final output that is browser compatible (which doesn’t 
+need access to the file system).
+
+npm install webpack webpack-cli --save-dev 
+--save-dev: saves webpack as a development dependency - these are tools that we use when developing projects
+but not when we push them to production
+
+## NPM ##
+The node package manager is a command-line tool that gives you access to a gigantic repository of plugins, 
+libraries and tools. 
+Unscoped packages are always public, which means they can be searched for, downloaded, and installed by 
+anyone. To install a public package, on the command line, run: npm install <package_name>
+This will create the node_modules directory in your current directory (if one doesn't exist yet) and will 
+download the package to that directory.
+
+Scoped public packages can be downloaded and installed by anyone, as long as the scope name is referenced 
+during installation: npm install @SCOPE/package-name
+
+Private packages can only be downloaded and installed by those who have been granted read access to the 
+package. Since private packages are always scoped, you must reference the scope name during installation:
+npm install @scope/private-package-name
+
+Unscoped packages are always public. Private packages are always scoped. Scoped packages are private by 
+default; you must pass a command-line flag when publishing to make them public. 
+
+
+## WEBPACK ##
+What if we had a way to write multiple files and/or import multiple third-party libraries but eventually 
+combine them all into fewer files at the end so the browser did not have to make so many requests?  BUNDLERS
+Give a bundler a starting file (an entry point) and it will build a dependency graph of the modules and 
+dependencies starting from that file, then combine them into a single output file that is production-ready loadable in the browser.
+
+A JavaScript bundler can be used when your project becomes too large for a single file or when you're 
+working with libraries that have multiple dependencies.
+
+A bundler's operation is divided into 2 stages: dependency graph generation and eventual bundling.
+- The first thing a module bundler does is generate a relationship map of all the served files. This 
+process is called Dependency Resolution. After receiving inputs and traversing its dependencies during the Dependency Resolution phase,
+a bundler delivers static assets that the browser can successfully process. This output stage is called Packing.
+
+Webpack is a very powerful tool, and with that power comes a decent amount of complexity. Don’t let it scare you off! The basic 
+configuration is not difficult and proficiency with webpack looks AMAZING on resumes.
+
+There are some typical problems with managing JavaScript projects:
+- It is not immediately apparent that the script depends on an external library.
+- If a dependency is missing, or included in the wrong order, the application will not function properly.
+- If a dependency is included but not used, the browser will be forced to download unnecessary code.
+
+When installing a package that will be bundled into your production bundle, you should use npm install --save. If you're installing a 
+package for development purposes (e.g. a linter, testing libraries, etc.) then you should use npm install --save-dev.
+
+Building the Bundle
+Run npx webpack to build the bundle.
+This will take the script at index.js and generate the optimized bundle.
+The output will be saved in the dist directory.
+Open index.html in your browser to see the "Hello webpack" output.
+ES2015 Modules
+The import and export statements are supported out-of-the-box by Webpack, even in browsers that don't natively support the new syntax.
+
+The import and export statements have been standardized in ES2015. 
+Behind the scenes, webpack actually "transpiles" the code so that older browsers can also run it. 
+most projects will need a more complex setup, which is why webpack supports a configuration file. This is much more efficient 
+than having to manually type in a lot of commands in the terminal. 
+
+const path = require('path');
+
+module.exports = {
+  entry: './src/index.js',
+  output: {
+    filename: 'main.js',
+    path: path.resolve(__dirname, 'dist'),
+  },
+};
+
+npx webpack --config webpack.config.js
+
+If a webpack.config.js is present, the webpack command picks it up by default. We use the --config option here only to show that 
+you can pass a configuration of any name. This will be useful for more complex configurations that need to be split into multiple files.
+A configuration file allows far more flexibility than CLI usage. We can specify loader rules, plugins, resolve options and many other enhancements this way. 
+psckage.json:  {
+   "name": "webpack-demo",
+   "version": "1.0.0",
+   "description": "",
+   "private": true,
+   "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack" <------------------------------------- Now the npm run build command can be used in place of the npx command we used earlier! 
+   },
+   "keywords": [],
+   "author": "",
+   "license": "ISC",
+   "devDependencies": {
+     "webpack": "^5.4.0",
+     "webpack-cli": "^4.2.0"
+   },
+   "dependencies": {
+     "lodash": "^4.17.20"
+   }
+ }
+
+ Custom parameters can be passed to webpack by adding two dashes between the npm run build command and your parameters, e.g. npm run build -- --color.
+
+ In the above example, we rearranged the files into a src and dist folder. Technically, we could have called those folders anything, but those names 
+ are typical. SRC is our source directory. In other words, src is where we write all of the code that webpack is going to bundle up for us. When webpack 
+ runs, it goes through all of our files starting at any entry points we give it, looks for any import statements and then compiles all of the code we 
+ need to run our site into a single file per entry point inside of the DIST folder (short for distribution). In this example, we have a single entry 
+point - /src/index.js. The output file is the compiled version - dist/main.js.
+
+## WEBPACK CORE CONCEPTS ##
+Entry:
+An entry point indicates which module webpack should use to begin building out its internal dependency graph. Webpack will figure out which other 
+modules and libraries that entry point depends on (directly and indirectly). By default its value is ./src/index.js, but you can specify a different 
+(or multiple) entry points by setting an entry property in the webpack configuration.
+Output:
+The output property tells webpack where to emit the bundles it creates and how to name these files. It defaults to ./dist/main.js for the main output 
+file and to the ./dist folder for any other generated file.
+Loaders:
+Out of the box, webpack only understands JavaScript and JSON files. Loaders allow webpack to process other types of files and convert them into valid 
+modules that can be consumed by your application and added to the dependency graph.
+At a general level, loaders have TWO properties in your webpack configuration:
+- The test property identifies which file or files should be transformed.
+- The use property indicates which loader should be used to do the transforming.
+Plugins:
+While loaders are used to transform certain types of modules, plugins can be leveraged to perform a wider range of tasks like bundle optimization, 
+asset management and injection of environment variables. In order to use a plugin, you need to require() it and add it to the plugins array. Most 
+plugins are customizable through options. Since you can use a plugin multiple times in a configuration for different purposes, you need to create 
+an instance of it by calling it with the new operator.
+Mode:
+By setting the mode parameter to either development, production or none, you can enable webpack's built-in optimizations that correspond to each 
+environment. The default value is production.
+Browser Compatibility:
+Webpack supports all browsers that are ES5-compliant (IE8 and below are not supported). Webpack needs Promise for import() and require.ensure(). 
+If you want to support older browsers, you will need to load a polyfill before using these expressions.
+
+
+## ES6 MODULES ## also known as ESM
+2 Components: import and export
+IMPORT:
+// a file called functionOne.js
+const functionOne = () => console.log('FUNCTION ONE!');
+export { functionOne };
+
+// another JS file
+import { functionOne } from './functionOne';
+functionOne(); // this should work as expected! 
+
+There are many benefits to writing your code in modules. One of the most compelling is code reuse.
+The "module pattern" and ES6 modules are not the same things. With the introduction of ES6 Modules, the module pattern (IIFEs) is NOT needed anymore, 
+though you might still encounter them in the wild. When using ES6 modules, only what is exported can be accessed in other modules by importing. Additionally, 
+any declarations made in a module are not automatically added to the global scope. ENCAPSULATION; You can still export constructors, classes and function factories
+
+There are TWO different ways to use exports in your code: named exports and default exports. You can have MULTIPLE named exports per module but only ONE default export. 
+Which option you use depends on what you’re exporting. 
+
+After the export keyword, you can use let, const, and var declarations, as well as function or class declarations. You can also use the export { name1, name2 } syntax 
+to export a list of names declared elsewhere. Note that export {} does not export an empty object — it's a no-op declaration that exports nothing (an empty name list).
+Named exports: 
+// a file called myModule.js
+const functionOne = () => 'ONE';
+const functionTwo = () => 'TWO';
+
+export {
+  functionOne,
+  functionTwo
+};
+
+// index.js in /src folder - corresponding imports
+import {functionOne, functionTwo} from './myModule';
+
+Export declarations are not subject to temporal dead zone rules. You can declare that the module exports X before the name X itself is declared.
+// some other file
+import m from "./test"; // note that we have the freedom to use import m instead of import k, because k was default export
+console.log(m); // 12
+
+export { myFunction as "my-function" };
+
+The "export from" syntax allows a module to re-export values (such as functions, variables, or classes) that were originally exported from another 
+module, without the need to first import them into the current module.
+This is useful when you want to create a "barrel module" - a single module that consolidates and re-exports various exports from other modules. This 
+can make it more convenient for consumers of your code to access the functionality they need, as they can import everything they need from the barrel 
+module, rather than having to remember where each individual export is located.
+The "export from" syntax is essentially a shorthand for the following two-step process:
+Import the desired exports from the other module using the regular import statement.
+Re-export those imports using the regular export statement.
+So, the statement:
+javascript
+export { default as function1, function2 } from "bar.js";
+
+is equivalent to:
+javascript
+import { default as function1, function2 } from "bar.js";
+export { function1, function2 };
+
+The key difference is that with the "export from" syntax, the imported functions function1 and function2 are not made available within the current module - they are only re-exported. This can be useful if you want to provide a curated set of exports from your barrel module, without exposing all of the internal implementation details.
+// Exporting declarations
+export let name1, name2/*, … */; // also var
+export const name1 = 1, name2 = 2/*, … */; // also var, let
+export function functionName() { /* … */ }
+export class ClassName { /* … */ }
+export function* generatorFunctionName() { /* … */ }
+export const { name1, name2: bar } = o;
+export const [ name1, name2 ] = array;
+
+// Export list
+export { name1, /* …, */ nameN };
+export { variable1 as name1, variable2 as name2, /* …, */ nameN };
+export { variable1 as "string name" };
+export { name1 as default /*, … */ };
+
+// Default exports
+export default expression;
+export default function functionName() { /* … */ }
+export default class ClassName { /* … */ }
+export default function* generatorFunctionName() { /* … */ }
+export default function () { /* … */ }
+export default class { /* … */ }
+export default function* () { /* … */ }
+
+// Aggregating modules
+export * from "module-name";
+export * as name1 from "module-name";
+export { name1, /* …, */ nameN } from "module-name";
+export { import1 as name1, import2 as name2, /* …, */ nameN } from "module-name";
+export { default, /* …, */ } from "module-name";
+export { default as name1 } from "module-name";
+
+
+import defaultExport from "module-name";
+import * as name from "module-name";
+import { export1 } from "module-name";
+import { export1 as alias1 } from "module-name";
+import { default as alias } from "module-name";
+import { export1, export2 } from "module-name";
+import { export1, export2 as alias2, /* … */ } from "module-name";
+import { "string name" as alias } from "module-name";
+import defaultExport, { export1, /* … */ } from "module-name";
+import defaultExport, * as name from "module-name";
+import "module-name";
+
+import declarations can only be present in modules, and only at the top-level (i.e. not inside blocks, functions, etc.). 
+
+There are FOUR forms of import declarations:
+
+Named import: import { export1, export2 } from "module-name";
+Default import: import defaultExport from "module-name";
+Namespace import: import * as name from "module-name";
+Side effect import: import "module-name";
+Import an entire module for side effects only, without importing anything. This runs the module's global code, but doesn't 
+actually import any values.
+
+import myDefault, * as myModule from "/modules/my-module.js";
+// myModule.default and myDefault point to the same binding
+
+
+IF JS says there an unexpected indentifier, then we just need to tell JS that we are using modules. We do this by
+writing type="module" in the srcipt tag and we are good to go!
