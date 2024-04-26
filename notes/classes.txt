@@ -1,0 +1,520 @@
+Classes do the exact same thing as constructors and prototypes in JS. 
+There's some controversy with classes - Opponents argue that class is 
+basically just syntactic sugar over the existing prototype-based constructors 
+and that it’s dangerous and/or misleading to obscure what’s really going on with these objects.
+
+# GETTERS AND SETTERS #
+Two kinds of object properties: data properties and accesor properties (the functions that execute
+on getting or setting a value);
+
+let obj = {
+  get propName() {
+    // getter, the code executed on getting obj.propName
+  },
+
+  set propName(value) {
+    // setter, the code executed on setting obj.propName = value
+  }
+};
+
+let user = {
+  name: "John",
+  surname: "Smith",
+
+  get fullName() {
+    return `${this.name} ${this.surname}`;
+  }
+};
+
+alert(user.fullName); // John Smith
+
+From the outside, an accessor property looks like a regular one. That’s the idea of accessor properties. 
+We don’t call user.fullName as a function, we read it normally: the getter runs behind the scenes.
+
+let user = {
+  name: "John",
+  surname: "Smith",
+
+  get fullName() {
+    return `${this.name} ${this.surname}`;
+  },
+
+  set fullName(value) {
+    [this.name, this.surname] = value.split(" ");
+  }
+};
+
+// set fullName is executed with the given value.
+user.fullName = "Alice Cooper";
+
+alert(user.name); // Alice
+alert(user.surname); // Cooper
+* As the result, we have a “virtual” property fullName. It is readable and writable.
+
+let user = {
+  name: "John",
+  surname: "Smith"
+};
+
+Object.defineProperty(user, 'fullName', {
+  get() {
+    return `${this.name} ${this.surname}`;
+  },
+
+  set(value) {
+    [this.name, this.surname] = value.split(" ");
+  }
+});
+
+alert(user.fullName); // John Smith
+
+for(let key in user) alert(key); // name, surname
+
+*** Please note that a property can be either an accessor (has get/set methods) or a data property (has a value), 
+but NOT both. *** If you try to put a get method and a value method on a property it will fail.
+
+Getters/setters can be used as wrappers over “real” property values to gain more control over operations with them.
+
+For instance, if we want to forbid too short names for user, we can have a setter name and keep the value in a separate property _name:
+
+let user = {
+  get name() {
+    return this._name;
+  },
+
+  set name(value) {
+    if (value.length < 4) {
+      alert("Name is too short, need at least 4 characters");
+      return;
+    }
+    this._name = value;
+  }
+};
+
+user.name = "Pete";
+alert(user.name); // Pete
+
+user.name = ""; // Name is too short...
+
+function User(name, birthday) {
+  this.name = name;
+  this.birthday = birthday;
+
+  // age is calculated from the current date and birthday
+  Object.defineProperty(this, "age", {
+    get() {
+      let todayYear = new Date().getFullYear();
+      return todayYear - this.birthday.getFullYear();
+    }
+  });
+}
+
+let john = new User("John", new Date(1992, 6, 1));
+alert( john.birthday ); // birthday is available
+alert( john.age );      // ...as well as the age
+
+
+# CLASS BASED SYNTAX #
+In JavaScript, a class is a kind of function. alert(typeOf exampleClass ) // Function
+Classes are a template for creating objects.  
+class User {
+  constructor(name) {
+    this.name = name;
+  }
+
+  sayHi() {
+    alert(this.name);
+  }
+
+}
+
+// Usage:
+let user = new User("John");
+user.sayHi();
+
+No comma between class methods
+A common pitfall for novice developers is to put a comma between class methods, which would result in a syntax error.
+
+The notation here is not to be confused with object literals:
+const person = {
+  name: 'John Doe',
+  age: 30,
+  address: '123 Main Street'
+};
+But within classes, no commas are required and putting thhem results in an error.
+
+class User {
+  constructor(name) { this.name = name; }
+  sayHi() { alert(this.name); }
+}
+
+// proof: User is a function
+alert(typeof User); // function
+
+** What class User {...} construct really does is:
+- Creates a function named User, that becomes the result of the class declaration. The 
+function code is taken from the constructor method (assumed empty if we don’t write such method).
+- Stores class methods, such as sayHi, in User.prototype.
+After new User object is created, when we call its method, it’s taken from the prototype, just 
+as described in the chapter F.prototype. So the object has access to class methods.
+
+class User {
+  constructor(name) { this.name = name; }
+  sayHi() { alert(this.name); }
+}
+// class is a function
+alert(typeof User); // function
+// ...or, more precisely, the constructor method
+alert(User === User.prototype.constructor); // true
+// The methods are in User.prototype, e.g:
+alert(User.prototype.sayHi); // the code of the sayHi method
+// there are exactly two methods in the prototype
+alert(Object.getOwnPropertyNames(User.prototype)); // constructor, sayHi
+
+Sometimes people say that class is a “syntactic sugar” (syntax that is designed to make things 
+easier to read, but doesn’t introduce anything new). But there are some differences:
+1. First, a function created by class is labelled by a special internal property 
+[[IsClassConstructor]]: true. So it’s not entirely the same as creating it manually.
+2. Class methods are non-enumerable. A class definition sets enumerable flag to false for all methods in the "prototype".
+That’s good, because if we for..in over an object, we usually don’t want its class methods.
+3. Classes ALWAYS use strict. All code inside the class construct is automatically in strict mode.
+4. Class declarations have the same temporal dead zone restrictions as let or const and behave as if they are not hoisted.
+
+// Declaration
+class Rectangle {
+  constructor(height, width) {
+    this.height = height;
+    this.width = width;
+  }
+}
+
+// Expression; the class is anonymous but assigned to a variable
+const Rectangle = class {
+  constructor(height, width) {
+    this.height = height;
+    this.width = width;
+  }
+};
+
+// Expression; the class has its own name
+const Rectangle = class Rectangle2 {
+  constructor(height, width) {
+    this.height = height;
+    this.width = width;
+  }
+};
+
+Class Expression:
+let User = class {
+  sayHi() {
+    alert("Hello");
+  }
+};
+// "Named Class Expression"
+// (no such term in the spec, but that's similar to Named Function Expression)
+let User = class MyClass {
+  sayHi() {
+    alert(MyClass); // MyClass name is visible only inside the class
+  }
+};
+
+new User().sayHi(); // works, shows MyClass definition
+
+alert(MyClass); // error, MyClass name isn't visible outside of the class
+
+function makeClass(phrase) {
+  // declare a class and return it
+  return class {
+    sayHi() {
+      alert(phrase);
+    }
+  };
+}
+// Create a new class
+let User = makeClass("Hello");
+new User().sayHi(); // Hello
+
+
+class User {
+  constructor(name) {
+    // invokes the setter
+    this.name = name;
+  }
+  get name() {
+    return this._name;
+  }
+  set name(value) {
+    if (value.length < 4) {
+      alert("Name is too short.");
+      return;
+    }
+    this._name = value;
+  }
+}
+let user = new User("John");
+alert(user.name); // John
+user = new User(""); // Name is too short.
+
+class User {
+  ['say' + 'Hi']() {
+    alert("Hello");
+  }
+}
+new User().sayHi();
+
+class User {
+  name = "John";
+  sayHi() {
+    alert(`Hello, ${this.name}!`);
+  }
+}
+
+new User().sayHi(); // Hello, John!
+alert(user.name); // John
+alert(User.prototype.name); // undefined // the fields are set on the object not on the prototype
+
+Why does this following code return undefined?
+class Button {
+  constructor(value) {
+    this.value = value;
+  }
+  click() {
+    alert(this.value);
+  }
+}
+let button = new Button("hello");
+setTimeout(button.click, 1000); // undefined
+In JavaScript, the behavior of this within a function depends on how the function is called. 
+In the code snippet provided, when setTimeout calls button.click after the specified delay, the 
+context of this inside the click method is lost. 
+
+When setTimeout calls button.click, it's actually invoking the click method as a standalone function, 
+rather than as a method of the button object. In this context, this inside the click method refers to 
+the global object (window in a browser environment), not the button object.
+
+To fix this issue, you can use a callback function inside setTimeout to ensure that this refers to the button object:
+setTimeout(() => button.click(), 1000);
+Using an arrow function (() => button.click()) preserves the lexical scope of this, so when the arrow function is 
+executed inside setTimeout, this still refers to the button object, and button.click is called successfully.
+
+In JavaScript, functions in the form object.method() are called methods and are associated with objects. When you 
+call a method like button.click(), the click function is invoked in the context of the button object. Inside the 
+function body, this refers to the object before the dot (button in this case).
+
+However, when you pass a method reference like button.click as an argument to another function (in this case, setTimeout), 
+you are effectively passing just the function without any association with the object. JavaScript does not maintain 
+the context (the object to which the method belongs) when you pass a method reference like this.
+
+So, when setTimeout calls button.click after the specified delay, it invokes click as a standalone function, not as a 
+method of button. Inside the function body, this is not bound to any specific object, so it defaults to the global 
+object (window in a browser environment).
+
+This behavior is a common source of confusion in JavaScript, especially when dealing with asynchronous code and passing 
+method references as callbacks. To preserve the correct context (the value of this), you can use arrow functions or the 
+bind method to explicitly bind the function to a specific object. For example:
+setTimeout(button.click.bind(button), 1000);
+setTimeout(() => button.click(), 1000);
+
+The problem is called "losing this". There are two approaches to fixing it, as discussed in the chapter Function binding:
+
+1. Pass a wrapper-function, such as setTimeout(() => button.click(), 1000).
+2. Bind the method to object, e.g. in the constructor.
+
+Class fields provide another, quite elegant syntax:
+class Button {
+  constructor(value) {
+    this.value = value;
+  }
+  click = () => {
+    alert(this.value);
+  }
+}
+let button = new Button("hello");
+setTimeout(button.click, 1000); // hello
+The class field click = () => {...} is created on a per-object basis, there’s a separate function for each Button object,
+ with this inside it referencing that object. We can pass button.click around anywhere, and the value of this will always 
+ be correct. That’s especially useful in browser environment, for event listeners.
+
+ # STATIC METHODS #
+ Classes can have static properties and methods which are properties and methods that are accessed on the class itself 
+ and not on the instance of a class. Static methods are often utility functions, such as functions to create or clone 
+ objects, whereas static properties are useful for caches, fixed-configuration, or any other data you don't need to 
+ be replicated across instances.
+ class Point {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+  }
+
+  static displayName = "Point";
+  static distance(a, b) {
+    const dx = a.x - b.x;
+    const dy = a.y - b.y;
+
+    return Math.hypot(dx, dy);
+  }
+}
+
+const p1 = new Point(5, 5);
+const p2 = new Point(10, 10);
+p1.displayName; // undefined
+p1.distance; // undefined
+p2.displayName; // undefined
+p2.distance; // undefined
+
+console.log(Point.displayName); // "Point"
+console.log(Point.distance(p1, p2)); // 7.0710678118654755
+
+class Triple {
+  static customName = "Tripler";
+  static description = "I triple any number you provide";
+  static calculate(n = 1) {
+    return n * 3;
+  }
+}
+class SquaredTriple extends Triple {
+  static longDescription;
+  static description = "I square the triple of any number you provide";
+  static calculate(n) {
+    return super.calculate(n) * super.calculate(n);
+  }
+}
+console.log(Triple.description); // 'I triple any number you provide'
+console.log(Triple.calculate()); // 3
+console.log(Triple.calculate(6)); // 18
+const tp = new Triple();
+console.log(SquaredTriple.calculate(3)); // 81 (not affected by parent's instantiation)
+console.log(SquaredTriple.description); // 'I square the triple of any number you provide'
+console.log(SquaredTriple.longDescription); // undefined
+console.log(SquaredTriple.customName); // 'Tripler'
+// This throws because calculate() is a static member, not an instance member.
+console.log(tp.calculate()); // 'tp.calculate is not a function'
+
+
+
+class Animal {
+  constructor(name) {
+    this.name = name;
+  }
+  speak() {
+    console.log(`${this.name} makes a noise.`);
+  }
+}
+
+class Dog extends Animal {
+  constructor(name) {
+    super(name); // call the super class constructor and pass in the name parameter
+  }
+  speak() {
+    console.log(`${this.name} barks.`);
+  }
+}
+const d = new Dog("Mitzie");
+d.speak(); // Mitzie barks.
+
+
+
+class Cat {
+  constructor(name) {
+    this.name = name;
+  }
+  speak() {
+    console.log(`${this.name} makes a noise.`);
+  }
+}
+
+class Lion extends Cat {
+  speak() {
+    super.speak();
+    console.log(`${this.name} roars.`);
+  }
+}
+const l = new Lion("Fuzzy");
+l.speak();
+// Fuzzy makes a noise.
+// Fuzzy roars.
+
+
+# TEMPORAL DEAD ZONE #
+A variable declared with let, const, or class is said to be in a "temporal dead zone" (TDZ) 
+from the start of the block until code execution reaches the place where the variable is declared 
+and initialized.
+
+While inside the TDZ, the variable has not been initialized with a value, and any attempt to access 
+it will result in a ReferenceError. The variable is initialized with a value when execution reaches 
+the place in the code where it was declared. If no initial value was specified with the variable 
+declaration, it will be initialized with a value of undefined.
+
+This differs from var variables, which will return a value of undefined if they are accessed before 
+they are declared. The code below demonstrates the different result when let and var are accessed 
+in code before the place where they are declared. The term "temporal" is used because the zone depends 
+on the order of execution (time) rather than the order in which the code is written (position). For 
+example, the code below works because, even though the function that uses the let variable appears 
+before the variable is declared, the function is called outside the TDZ.
+
+{
+  // TDZ starts at beginning of scope
+  const func = () => console.log(letVar); // OK
+
+  // Within the TDZ letVar access throws `ReferenceError`
+
+  let letVar = 3; // End of TDZ (for letVar)
+  func(); // Called outside TDZ!
+}
+
+# EXTENDS KEYWORD #
+class ChildClass extends ParentClass { /* … */ }
+
+class DateFormatter extends Date {
+  getFormattedDate() {
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    return `${this.getDate()}-${months[this.getMonth()]}-${this.getFullYear()}`;
+  }
+}
+
+console.log(new DateFormatter('August 19, 1975 23:15:30').getFormattedDate());
+// Expected output: "19-Aug-1975"
+
+
+class ClassWithPrivateAccessor {
+  #message;
+  get #decoratedMessage() {
+    return `🎬${this.#message}🛑`;
+  }
+  set #decoratedMessage(msg) {
+    this.#message = msg;
+  }
+  constructor() {
+    this.#decoratedMessage = "hello world";
+    console.log(this.#decoratedMessage);
+  }
+}
+new ClassWithPrivateAccessor(); // 🎬hello world🛑
+
+
+class ClassWithPrivateStaticMethod {
+  static #privateStaticMethod() {
+    return 42;
+  }
+  static publicStaticMethod() {
+    return this.#privateStaticMethod();
+  }
+}
+class Subclass extends ClassWithPrivateStaticMethod {}
+console.log(Subclass.publicStaticMethod()); // TypeError: Cannot read private member 
+#privateStaticMethod from an object whose class did not declare it
+
+

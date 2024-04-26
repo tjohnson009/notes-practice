@@ -1,33 +1,33 @@
-The pupose of thhis is to learn how to separate state logic from UI and DOM driven logic decisions.
-The main analogy is building a house from the inside out. 
+// The pupose of thhis is to learn how to separate state logic from UI and DOM driven logic decisions.
+// The main analogy is building a house from the inside out. 
 
-Pretend for a moment that building a game application is something like building a house. Imagine 
-your dream house, and what it looks like in its final form. You're probably imagining all the elements 
-of a house that are supposed to be seen from the outside and enjoyed aesthetically: the outside of the 
-house, painted to your liking, decorations, the front yard, a charming front door. As you move inside, 
-each room looks like it came straight from HGTV. Brand new appliances, furniture, etc...
+// Pretend for a moment that building a game application is something like building a house. Imagine 
+// your dream house, and what it looks like in its final form. You're probably imagining all the elements 
+// of a house that are supposed to be seen from the outside and enjoyed aesthetically: the outside of the 
+// house, painted to your liking, decorations, the front yard, a charming front door. As you move inside, 
+// each room looks like it came straight from HGTV. Brand new appliances, furniture, etc...
 
-But what about the structural elements of the house? Of course we appreciate those things too, but we 
-don't often think about them because their implementation is hidden from our view in the final product.
+// But what about the structural elements of the house? Of course we appreciate those things too, but we 
+// don't often think about them because their implementation is hidden from our view in the final product.
 
-In the same way, our application's user interface should be a visual representation of underlying 
-application logic. In other words, behind everything that makes our game look and feel nice, there 
-should be solid, foundational code. 
+// In the same way, our application's user interface should be a visual representation of underlying 
+// application logic. In other words, behind everything that makes our game look and feel nice, there 
+// should be solid, foundational code. 
 
-Just like a builder would first consider the structural design and blueprints of a house before beginning 
-to imagine walls, doors, and windows, let's attempt to think through how our application is going to 
-function at its core before implementing details in the user interface.
+// Just like a builder would first consider the structural design and blueprints of a house before beginning 
+// to imagine walls, doors, and windows, let's attempt to think through how our application is going to 
+// function at its core before implementing details in the user interface.
 
-Our DOM elements and queries should NOT be responsible for storing or handling the implementation details
-of how our application works. That is not their responsibility, nor what they were designed to do. 
-The DOM should be responsible for reading and displaying the application state to the user and providing an 
-easy-to-use gateway to interact with the methods it needs to. For example, if I am making a game, my UI 
-should have access to a method it needs to use in order to play a round. This method should be simple to 
-call and as restrictive as possible (meaning, it should not need to provide a multitude of arguments to 
-do something). Conversely, the DOM probably doesn't need access to a way of changing which player's turn it is.
+// Our DOM elements and queries should NOT be responsible for storing or handling the implementation details
+// of how our application works. That is not their responsibility, nor what they were designed to do. 
+// The DOM should be responsible for reading and displaying the application state to the user and providing an 
+// easy-to-use gateway to interact with the methods it needs to. For example, if I am making a game, my UI 
+// should have access to a method it needs to use in order to play a round. This method should be simple to 
+// call and as restrictive as possible (meaning, it should not need to provide a multitude of arguments to 
+// do something). Conversely, the DOM probably doesn't need access to a way of changing which player's turn it is.
 
-***One great strategy to help keep game logic separate from your UI is to challenge yourself to build the game so 
-that it can be played, in full, in the console. ***
+// ***One great strategy to help keep game logic separate from your UI is to challenge yourself to build the game so 
+// that it can be played, in full, in the console. ***
 
 _____________________________
 
@@ -49,7 +49,7 @@ function Gameboard() {
   for (let i = 0; i < rows; i++) {
     board[i] = [];
     for (let j = 0; j < columns; j++) {
-      board[i].push(Cell());
+      board[i].push(Cell()); 
     }
   }
 
@@ -175,18 +175,18 @@ function GameController(
 const game = GameController();
 _____________________________
 
-It's worth noting at this point that the beauty of decoupled code is that 
-changing the implementation of any of the sub-modules will not require us 
-to rewrite our whole program. Say, for instance, we wanted to create a 
-version where the rows filled from the top-down. All we'd need to change is 
-the Gameboard.dropToken() method's details, and the rest of the game would 
-still run as intended.
+// It's worth noting at this point that the beauty of decoupled code is that 
+// changing the implementation of any of the sub-modules will not require us 
+// to rewrite our whole program. Say, for instance, we wanted to create a 
+// version where the rows filled from the top-down. All we'd need to change is 
+// the Gameboard.dropToken() method's details, and the rest of the game would 
+// still run as intended.
 
-Take a moment to understand that the only way the UI should need to interact
- with the core game code in order to play a round is through the GameController.playRound() method. 
- The cells are buttons, not divs. Why? In most cases, anything clickable should be a button or link. 
- This enables those with accessibility issues to still be able to use our site easily be tabbing and 
- selecting with the keyboard.
+// Take a moment to understand that the only way the UI should need to interact
+//  with the core game code in order to play a round is through the GameController.playRound() method. 
+//  The cells are buttons, not divs. Why? In most cases, anything clickable should be a button or link. 
+//  This enables those with accessibility issues to still be able to use our site easily be tabbing and 
+//  selecting with the keyboard.
 
  ______________________
 
@@ -336,9 +336,9 @@ function ScreenController() {
 }
 
 ScreenController();
-__________________________
+__________________________ 
 
-It should be easy to recognize that once the console version of our game was created, implementing the user interface 
-was incredibly simple. We limited the scope of the DOM's interaction with our game to just 3 methods, and as a result 
-did not need to worry about querying nodes for their text content or anything messy like that. As a result, our code 
-is significantly easier to read, easier to debug, and more performant than the spaghettified, DOM-coupled, alternative.
+// It should be easy to recognize that once the console version of our game was created, implementing the user interface 
+// was incredibly simple. We limited the scope of the DOM's interaction with our game to just 3 methods, and as a result 
+// did not need to worry about querying nodes for their text content or anything messy like that. As a result, our code 
+// is significantly easier to read, easier to debug, and more performant than the spaghettified, DOM-coupled, alternative.

@@ -258,3 +258,80 @@ const user = {
     }
 }
 user.fullName() => Tim Thompson 
+
+# COMPOSITION OVER INHERITANCE? #
+In JS, functions are first-class citizens. Functional programming is all about using functions 
+to their fullest extent. There is a notion called: “Favor Composition over Inheritance” and 
+here we are going in the opposite direction because “Class” notation favors “Inheritance over Composition”.
+Whenever possible, prefer to compose objects rather than introducing inheritance.
+
+Composition over inheritance (or composite reuse principle) in object-oriented programming (OOP) is the 
+principle that classes should favor polymorphic behavior and code reuse by their composition (by containing 
+instances of other classes that implement the desired functionality) over inheritance from a base or parent class.
+Inheritance and composition often work hand-in-hand however. 
+COMPOSITION is where you design your types around what they DO. 
+INHERITANCE is where you design your types around what they ARE.
+dog = pooper + barker
+cat = pooper + meower
+cleaningRobot = driver + cleaner
+murderRobot = driver + killer
+murderRobotDog = driver + killer + barker
+
+const barker = (state) => ({
+  bark: () => console.log('WOOF WOOF); 
+})
+
+The idea of composition over inheritance is a principle in software design that suggests favoring building 
+complex objects or behaviors by combining simpler parts rather than relying heavily on inheritance. Let's 
+break it down with a simple example in JavaScript:
+
+** Inheritance Example:
+// Base class using inheritance
+class Animal {
+  constructor(name) {
+    this.name = name;
+  }
+  speak() {
+    console.log(`${this.name} makes a sound`);
+  }
+}
+// Derived class using inheritance
+class Dog extends Animal {
+  speak() {
+    console.log(`${this.name} barks`);
+  }
+}
+const dog = new Dog("Buddy");
+dog.speak(); // Output: Buddy barks
+
+** Composition Example:
+// Reusable module using composition
+const speaker = {
+  speak(sound) {
+    console.log(`${this.name} ${sound}`);
+  }
+};
+// Object creation using composition
+function createDog(name) {
+  const dog = {
+    name,
+    bark() {
+      speaker.speak.call(this, 'barks'); ***
+    }
+  };
+  return dog;
+}
+const dog = createDog("Buddy");
+dog.bark(); // Output: Buddy barks
+
+Composition allows us to build objects by combining smaller, reusable parts (like the speaker module) 
+rather than creating complex inheritance hierarchies. This approach offers more flexibility and 
+modularity in our code because we can mix and match different behaviors easily.
+
+In the inheritance example, if we wanted to create a Cat class that meows instead of barks, we'd need 
+to create another class and possibly duplicate some code. But with composition, we can simply reuse 
+the speaker module to create a Cat object that meows without any extra effort.
+
+Overall, composition promotes code reusability, flexibility, and easier maintenance compared to heavy 
+reliance on inheritance. It's a fundamental principle in modern software design, emphasizing building 
+objects through collaboration rather than inheritance.
