@@ -1,0 +1,19 @@
+@font-face {
+    font-family: 'Keep-On-Truckin';
+    src: url('./KeeponTruckin.ttf') format('truetype');
+    font-weight: 600;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Play Pretend';
+    src: url('./Play\ Pretend.otf') format('opentype');
+    font-weight: 600;
+    font-style: normal;
+}
+
+.hello {
+    color: red; 
+    background: url('./ODIN.png');
+    font-family: 'Play Pretend';
+}
