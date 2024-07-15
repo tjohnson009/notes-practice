@@ -1,0 +1,101 @@
+Storage objects are simple key-value stores, similar to objects, but they stay intact through page loads. 
+The keys and the values are always strings
+
+You can access these values like an object, or with the Storage.getItem() and Storage.setItem() methods. 
+localStorage.colorSetting = "#a4509b";
+localStorage["colorSetting"] = "#a4509b";
+localStorage.setItem("colorSetting", "#a4509b");
+
+It's recommended to use the Web Storage API (setItem, getItem, removeItem, key, length) to prevent the pitfalls associated with using plain objects as key-value stores.
+
+The TWO mechanisms within Web Storage are as follows:
+
+sessionStorage maintains a separate storage area for each given origin that's available for the duration of the page session (as long as the browser is open, including page reloads and restores).
+localStorage does the same thing, but persists even when the browser is closed and reopened.
+
+These mechanisms are available via the Window.sessionStorage and Window.localStorage properties (to be more precise, in supporting browsers the Window object implements the WindowLocalStorage and WindowSessionStorage objects, which the localStorage and sessionStorage properties are members of) — invoking one of these will create an instance of the Storage object, through which data items can be set, retrieved, and removed.
+So, for example, initially calling localStorage on a document will return a Storage object; calling sessionStorage on a document will return a different Storage object. Both of these can be manipulated in the same way, but separately.
+
+Here is a function that detects whether localStorage is both supported and available:
+function storageAvailable(type) {
+  let storage;
+  try {
+    storage = window[type];
+    const x = "__storage_test__";
+    storage.setItem(x, x);
+    storage.removeItem(x);
+    return true;
+  } catch (e) {
+    return (
+      e instanceof DOMException &&
+      e.name === "QuotaExceededError" &&
+      // acknowledge QuotaExceededError only if there's something already stored
+      storage &&
+      storage.length !== 0
+    );
+  }
+}
+
+if (storageAvailable("localStorage")) {
+  // Yippee! We can use localStorage awesomeness
+} else {
+  // Too bad, no localStorage for us
+}
+
+Values can be retrieved from storage using Storage.getItem(). This takes the key of the data item as an argument, and returns the data value.
+
+function setStyles() {
+  const currentColor = localStorage.getItem("bgcolor");
+  const currentFont = localStorage.getItem("font");
+  const currentImage = localStorage.getItem("image");
+
+  document.getElementById("bgcolor").value = currentColor;
+  document.getElementById("font").value = currentFont;
+  document.getElementById("image").value = currentImage;
+
+  htmlElem.style.backgroundColor = `#${currentColor}`;
+  pElem.style.fontFamily = currentFont;
+  imgElem.setAttribute("src", currentImage);
+}
+
+Storage.setItem() is used both to create new data items, and (if the data item already exists) update existing values. This takes two arguments — the key of the data item to create/modify, and the value to store in it.
+
+function populateStorage() {
+  localStorage.setItem("bgcolor", document.getElementById("bgcolor").value);
+  localStorage.setItem("font", document.getElementById("font").value);
+  localStorage.setItem("image", document.getElementById("image").value);
+
+  setStyles();
+}
+
+We've also included an onchange handler on each form element so that the data and styling are updated whenever a form value is changed:
+
+bgcolorForm.onchange = populateStorage;
+fontForm.onchange = populateStorage;
+imageForm.onchange = populateStorage;
+
+Storage only supports storing and retrieving strings. If you want to save other data types, you have to convert them to strings. For plain objects and arrays, you can use JSON.stringify().
+
+const person = { name: "Alex" };
+localStorage.setItem("user", person);
+console.log(localStorage.getItem("user")); // "[object Object]"; not useful!
+localStorage.setItem("user", JSON.stringify(person));
+console.log(JSON.parse(localStorage.getItem("user"))); // { name: "Alex" }
+
+
+The StorageEvent is fired whenever a change is made to the Storage object (note that this event is not fired for sessionStorage changes).
+
+window.addEventListener("storage", (e) => {
+  document.querySelector(".my-key").textContent = e.key;
+  document.querySelector(".my-old").textContent = e.oldValue;
+  document.querySelector(".my-new").textContent = e.newValue;
+  document.querySelector(".my-url").textContent = e.url;
+  document.querySelector(".my-storage").textContent = JSON.stringify(
+    e.storageArea,
+  );
+});
+
+Storage.removeItem() takes a single argument — the key of the data item you want to remove — and removes it from the storage object for that domain.
+
+Storage.clear() takes no arguments, and empties the entire storage object for that domain.
+

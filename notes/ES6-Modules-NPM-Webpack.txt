@@ -6,6 +6,7 @@ npm install webpack webpack-cli --save-dev
 --save-dev: saves webpack as a development dependency - these are tools that we use when developing projects
 but not when we push them to production
 
+_______________________________________________________________________
 ## NPM ##
 The node package manager is a command-line tool that gives you access to a gigantic repository of plugins, 
 libraries and tools. 
@@ -24,116 +25,7 @@ npm install @scope/private-package-name
 Unscoped packages are always public. Private packages are always scoped. Scoped packages are private by 
 default; you must pass a command-line flag when publishing to make them public. 
 
-
-## WEBPACK ##
-What if we had a way to write multiple files and/or import multiple third-party libraries but eventually 
-combine them all into fewer files at the end so the browser did not have to make so many requests?  BUNDLERS
-Give a bundler a starting file (an entry point) and it will build a dependency graph of the modules and 
-dependencies starting from that file, then combine them into a single output file that is production-ready loadable in the browser.
-
-A JavaScript bundler can be used when your project becomes too large for a single file or when you're 
-working with libraries that have multiple dependencies.
-
-A bundler's operation is divided into 2 stages: dependency graph generation and eventual bundling.
-- The first thing a module bundler does is generate a relationship map of all the served files. This 
-process is called Dependency Resolution. After receiving inputs and traversing its dependencies during the Dependency Resolution phase,
-a bundler delivers static assets that the browser can successfully process. This output stage is called Packing.
-
-Webpack is a very powerful tool, and with that power comes a decent amount of complexity. Don’t let it scare you off! The basic 
-configuration is not difficult and proficiency with webpack looks AMAZING on resumes.
-
-There are some typical problems with managing JavaScript projects:
-- It is not immediately apparent that the script depends on an external library.
-- If a dependency is missing, or included in the wrong order, the application will not function properly.
-- If a dependency is included but not used, the browser will be forced to download unnecessary code.
-
-When installing a package that will be bundled into your production bundle, you should use npm install --save. If you're installing a 
-package for development purposes (e.g. a linter, testing libraries, etc.) then you should use npm install --save-dev.
-
-Building the Bundle
-Run npx webpack to build the bundle.
-This will take the script at index.js and generate the optimized bundle.
-The output will be saved in the dist directory.
-Open index.html in your browser to see the "Hello webpack" output.
-ES2015 Modules
-The import and export statements are supported out-of-the-box by Webpack, even in browsers that don't natively support the new syntax.
-
-The import and export statements have been standardized in ES2015. 
-Behind the scenes, webpack actually "transpiles" the code so that older browsers can also run it. 
-most projects will need a more complex setup, which is why webpack supports a configuration file. This is much more efficient 
-than having to manually type in a lot of commands in the terminal. 
-
-const path = require('path');
-
-module.exports = {
-  entry: './src/index.js',
-  output: {
-    filename: 'main.js',
-    path: path.resolve(__dirname, 'dist'),
-  },
-};
-
-npx webpack --config webpack.config.js
-
-If a webpack.config.js is present, the webpack command picks it up by default. We use the --config option here only to show that 
-you can pass a configuration of any name. This will be useful for more complex configurations that need to be split into multiple files.
-A configuration file allows far more flexibility than CLI usage. We can specify loader rules, plugins, resolve options and many other enhancements this way. 
-psckage.json:  {
-   "name": "webpack-demo",
-   "version": "1.0.0",
-   "description": "",
-   "private": true,
-   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack" <------------------------------------- Now the npm run build command can be used in place of the npx command we used earlier! 
-   },
-   "keywords": [],
-   "author": "",
-   "license": "ISC",
-   "devDependencies": {
-     "webpack": "^5.4.0",
-     "webpack-cli": "^4.2.0"
-   },
-   "dependencies": {
-     "lodash": "^4.17.20"
-   }
- }
-
- Custom parameters can be passed to webpack by adding two dashes between the npm run build command and your parameters, e.g. npm run build -- --color.
-
- In the above example, we rearranged the files into a src and dist folder. Technically, we could have called those folders anything, but those names 
- are typical. SRC is our source directory. In other words, src is where we write all of the code that webpack is going to bundle up for us. When webpack 
- runs, it goes through all of our files starting at any entry points we give it, looks for any import statements and then compiles all of the code we 
- need to run our site into a single file per entry point inside of the DIST folder (short for distribution). In this example, we have a single entry 
-point - /src/index.js. The output file is the compiled version - dist/main.js.
-
-## WEBPACK CORE CONCEPTS ##
-Entry:
-An entry point indicates which module webpack should use to begin building out its internal dependency graph. Webpack will figure out which other 
-modules and libraries that entry point depends on (directly and indirectly). By default its value is ./src/index.js, but you can specify a different 
-(or multiple) entry points by setting an entry property in the webpack configuration.
-Output:
-The output property tells webpack where to emit the bundles it creates and how to name these files. It defaults to ./dist/main.js for the main output 
-file and to the ./dist folder for any other generated file.
-Loaders:
-Out of the box, webpack only understands JavaScript and JSON files. Loaders allow webpack to process other types of files and convert them into valid 
-modules that can be consumed by your application and added to the dependency graph.
-At a general level, loaders have TWO properties in your webpack configuration:
-- The test property identifies which file or files should be transformed.
-- The use property indicates which loader should be used to do the transforming.
-Plugins:
-While loaders are used to transform certain types of modules, plugins can be leveraged to perform a wider range of tasks like bundle optimization, 
-asset management and injection of environment variables. In order to use a plugin, you need to require() it and add it to the plugins array. Most 
-plugins are customizable through options. Since you can use a plugin multiple times in a configuration for different purposes, you need to create 
-an instance of it by calling it with the new operator.
-Mode:
-By setting the mode parameter to either development, production or none, you can enable webpack's built-in optimizations that correspond to each 
-environment. The default value is production.
-Browser Compatibility:
-Webpack supports all browsers that are ES5-compliant (IE8 and below are not supported). Webpack needs Promise for import() and require.ensure(). 
-If you want to support older browsers, you will need to load a polyfill before using these expressions.
-
-
+_______________________________________________________________________
 ## ES6 MODULES ## also known as ESM
 2 Components: import and export
 IMPORT:
@@ -255,3 +147,659 @@ import myDefault, * as myModule from "/modules/my-module.js";
 
 IF JS says there an unexpected indentifier, then we just need to tell JS that we are using modules. We do this by
 writing type="module" in the srcipt tag and we are good to go!
+
+If we want to import NON-DEFAULT exports and more than one then we need to put them in curly braces in our import statement
+
+
+_______________________________________________________________________
+
+## WEBPACK ##
+What if we had a way to write multiple files and/or import multiple third-party libraries but eventually 
+combine them all into fewer files at the end so the browser did not have to make so many requests?  BUNDLERS
+Give a bundler a starting file (an entry point) and it will build a dependency graph of the modules and 
+dependencies starting from that file, then combine them into a single output file that is production-ready loadable in the browser.
+
+A JavaScript bundler can be used when your project becomes too large for a single file or when you're 
+working with libraries that have multiple dependencies.
+
+A bundler's operation is divided into 2 stages: dependency graph generation and eventual bundling.
+- The first thing a module bundler does is generate a relationship map of all the served files. This 
+process is called Dependency Resolution. After receiving inputs and traversing its dependencies during the Dependency Resolution phase,
+a bundler delivers static assets that the browser can successfully process. This output stage is called Packing.
+
+Webpack is a very powerful tool, and with that power comes a decent amount of complexity. Don’t let it scare you off! The basic 
+configuration is not difficult and proficiency with webpack looks AMAZING on resumes.
+
+There are some typical problems with managing JavaScript projects:
+- It is not immediately apparent that the script depends on an external library.
+- If a dependency is missing, or included in the wrong order, the application will not function properly.
+- If a dependency is included but not used, the browser will be forced to download unnecessary code.
+
+When installing a package that will be bundled into your production bundle, you should use npm install --save. If you're installing a 
+package for development purposes (e.g. a linter, testing libraries, etc.) then you should use npm install --save-dev.
+
+Building the Bundle
+Run npx webpack to build the bundle.
+This will take the script at index.js and generate the optimized bundle.
+The output will be saved in the dist directory.
+Open index.html in your browser to see the "Hello webpack" output.
+ES2015 Modules
+The import and export statements are supported out-of-the-box by Webpack, even in browsers that don't natively support the new syntax.
+
+The import and export statements have been standardized in ES2015. 
+Behind the scenes, webpack actually "transpiles" the code so that older browsers can also run it. 
+most projects will need a more complex setup, which is why webpack supports a configuration file. This is much more efficient 
+than having to manually type in a lot of commands in the terminal. 
+
+const path = require('path');
+
+module.exports = {
+  entry: './src/index.js',
+  output: {
+    filename: 'main.js',
+    path: path.resolve(__dirname, 'dist'),
+  },
+};
+
+npx webpack --config webpack.config.js
+
+If a webpack.config.js is present, the webpack command picks it up by default. We use the --config option here only to show that 
+you can pass a configuration of any name. This will be useful for more complex configurations that need to be split into multiple files.
+A configuration file allows far more flexibility than CLI usage. We can specify loader rules, plugins, resolve options and many other enhancements this way. 
+psckage.json:  {
+   "name": "webpack-demo",
+   "version": "1.0.0",
+   "description": "",
+   "private": true,
+   "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack" <------------------------------------- Now the npm run build command can be used in place of the npx command we used earlier! 
+   },
+   "keywords": [],
+   "author": "",
+   "license": "ISC",
+   "devDependencies": {
+     "webpack": "^5.4.0",
+     "webpack-cli": "^4.2.0"
+   },
+   "dependencies": {
+     "lodash": "^4.17.20"
+   }
+ }
+
+ Custom parameters can be passed to webpack by adding two dashes between the npm run build command and your parameters, e.g. npm run build -- --color.
+
+ In the above example, we rearranged the files into a src and dist folder. Technically, we could have called those folders anything, but those names 
+ are typical. SRC is our source directory. In other words, src is where we write all of the code that webpack is going to bundle up for us. When webpack 
+ runs, it goes through all of our files starting at any entry points we give it, looks for any import statements and then compiles all of the code we 
+ need to run our site into a single file per entry point inside of the DIST folder (short for distribution). In this example, we have a single entry 
+point - /src/index.js. The output file is the compiled version - dist/main.js.
+
+_______________________________________________________________________
+## WEBPACK CORE CONCEPTS ##
+Entry:
+An entry point indicates which module webpack should use to begin building out its internal dependency graph. Webpack will figure out which other 
+modules and libraries that entry point depends on (directly and indirectly). By default its value is ./src/index.js, but you can specify a different 
+(or multiple) entry points by setting an entry property in the webpack configuration.
+Output:
+The output property tells webpack where to emit the bundles it creates and how to name these files. It defaults to ./dist/main.js for the main output 
+file and to the ./dist folder for any other generated file.
+Loaders:
+Out of the box, webpack only understands JavaScript and JSON files. Loaders allow webpack to process other types of files and convert them into valid 
+modules that can be consumed by your application and added to the dependency graph.
+At a general level, loaders have TWO properties in your webpack configuration:
+- The test property identifies which file or files should be transformed.
+- The use property indicates which loader should be used to do the transforming.
+Plugins:
+While loaders are used to transform certain types of modules, plugins can be leveraged to perform a wider range of tasks like bundle optimization, 
+asset management and injection of environment variables. In order to use a plugin, you need to require() it and add it to the plugins array. Most 
+plugins are customizable through options. Since you can use a plugin multiple times in a configuration for different purposes, you need to create 
+an instance of it by calling it with the new operator.
+Mode:
+By setting the mode parameter to either development, production or none, you can enable webpack's built-in optimizations that correspond to each 
+environment. The default value is production.
+Browser Compatibility:
+Webpack supports all browsers that are ES5-compliant (IE8 and below are not supported). Webpack needs Promise for import() and require.ensure(). 
+If you want to support older browsers, you will need to load a polyfill before using these expressions.
+
+Another amazing feature is webpack’s ability to process and manipulate your code as it bundles it. Since images and CSS files are not JavaScript, 
+however, Webpack will not know how to process them unless you tell it how to by including the correct loaders and rules.
+
+
+*** If you have any issues loading fonts with Webpack, the issue is not with Webpack, but how you declare the CSS rule.
+https://stackoverflow.com/questions/49877149/webpack-cant-load-fonts-ttf/68838464#68838464  -- this links helped tremendous
+Any of the following format types are valid:
+
+"woff", "woff2", "truetype", "opentype", "embedded-opentype", "svg". // DO NOT write 'ttf', 'otf', etc. 
+
+EXAMPLE:
+@font-face {
+   font-family: 'MyFont';
+   src: url('./my-font.ttf') format('truetype'); // NOT ttf
+}
+This should also work:
+
+@font-face {
+   font-family: 'MyFont';
+   src: url('./my-font.ttf');
+}
+
+
+One of the coolest webpack features is that you can also include any other type of file, besides JavaScript, for which 
+there is a loader or built-in Asset Modules support. an example would be for CSS files
+npm install --save-dev style-loader css-loader
+
+module: { // in our webpack.config file
+    rules: [
+      {
+        test: /\.css$/i,
+        use: ['style-loader', 'css-loader'],
+      },
+    ],
+  },
+
+  Module loaders can be chained. Each loader in the chain applies transformations to the processed resource. A chain is 
+  executed in reverse order. The first loader passes its result (resource with applied transformations) to the next one, 
+  and so forth. Finally, webpack expects JavaScript to be returned by the last loader in the chain.
+  npm run build
+
+    const myIcon = new Image(); // creating a new element via /jS after importing it
+    myIcon.src = ODIN;
+
+The Asset Modules will take any file you load through them and output it to your build directory. This means we can use 
+them for any kind of file, including fonts. 
+We can also use webpack for loading data into our files. 
+npm install --save-dev csv-loader xml-loader
+
+const path = require('path');
+
+module.exports = {
+  entry: './src/index.js',
+  output: {
+    filename: 'bundle.js',
+    path: path.resolve(__dirname, 'dist'),
+  },
+  mode: 'production', 
+  module: {
+    rules: [
+      {
+        test: /\.css$/i,
+        use: ['style-loader', 'css-loader'], // css loader --> style-loader --> JS module
+      },
+      {
+        test: /\.(png|svg|jpg|jpeg|gif)$/i,
+        type: 'asset/resource',
+      },
+      {
+        test: /\.(woff|woff2|eot|ttf|otf)$/i,
+        type: 'asset/resource',
+      },
+                                                {
+                                                    test: /\.(csv|tsv)$/i,
+                                                    use: ['csv-loader'],
+                                                },
+                                                {
+                                                    test: /\.xml$/i,
+                                                    use: ['xml-loader'],
+                                                },
+    ],
+  },
+};
+*** This can be especially helpful when implementing some sort of data visualization using a tool like d3. Instead 
+of making an ajax request and parsing the data at runtime you can load it into your module during the build process 
+so that the parsed data is ready to go as soon as the module hits the browser.
+note on JSON: Only the DEFAULT export of JSON modules can be used without warning.
+// No warning
+import data from './data.json';
+
+// Warning shown, this is not allowed by the spec.
+import { foo } from './data.json';
+
+## BASIC FLOW OF SETTING THINGS UP WITH WEBPACK ##
+- Create or get the files and place them in the src folder 
+- npm install the loaders, plugins or tools as dev dependencies 
+- Update your webpack config file with something like this: 
+      {
+        test: /\.(csv|tsv)$/i,
+        use: ['csv-loader'],
+      },
+      {
+        test: /\.xml$/i,
+        use: ['xml-loader'],
+      },
+- import the modules into your index.js file 
+- do what you need to with the data and files in your code 
+- npm run build to let webpack do what it needs to do
+
+The coolest part of everything mentioned above, is that loading assets this way allows you to group modules and 
+assets in a more intuitive way. Instead of relying on a global /assets directory that contains everything, you 
+can group assets with the code that uses them. For example, a structure like this can be useful:
+
+ |-  assets XX NO don't do this... 
+ |– /components
+ |  |– /my-component
+ |  |  |– index.jsx
+ |  |  |– index.css
+ |  |  |– icon.svg
+ |  |  |– img.png
+
+ This setup makes your code a lot more portable as everything that is closely coupled now lives together. Let's say 
+ you want to use /my-component in another project, copy or move it into the /components directory over there. As long 
+ as you've installed any external dependencies and your configuration has the same loaders defined, you should be good to go.
+
+However, let's say you're locked into your old ways or you have some assets that are shared between multiple components 
+(views, templates, modules, etc.). It's still possible to store these assets in a base directory and even use aliasing to 
+make them easier to import.
+
+Initialize a new Node.js project
+Open your terminal or command prompt and navigate to the directory where you want to create your Todo List project.
+Run npm init -y to create a new package.json file, which will hold your project's dependencies and scripts.
+Install Webpack and related dependencies
+Run npm install --save-dev webpack webpack-cli to install Webpack and its command-line interface as development dependencies.
+You may also want to install additional dependencies like webpack-dev-server for development server functionality, and loaders like babel-loader for transpiling modern JavaScript syntax.
+Create a Webpack configuration file
+Create a new file named webpack.config.js in the root directory of your project.
+In this file, you'll define the configuration for Webpack, including entry points, output settings, and any necessary loaders or plugins.
+Here's a basic example configuration:
+javascript
+const path = require('path');
+
+module.exports = {
+  entry: './src/index.js', // Entry point for your application
+  output: {
+    filename: 'bundle.js', // Output bundle file name
+    path: path.resolve(__dirname, 'dist'), // Output directory
+  },
+  module: {
+    rules: [
+      // Add rules for loaders here (e.g., babel-loader)
+    ],
+  },
+  // Add any additional configuration options or plugins here
+};
+
+WORKFLOW
+- Set up your project structure
+- Create a src directory in your project root, which will hold your application's source code.
+- Inside the src directory, create an index.js file, which will be the entry point for your Todo List application.
+- Optionally, you can create separate directories for components, utilities, or other modules within the src directory to better 
+organize your code.
+- Write your Todo List application code
+- In the index.js file (or other relevant files), start writing the code for your Todo List application, following the guidelines 
+and requirements outlined in the assignment.
+- Import any necessary dependencies or modules using the import or require statements, as Webpack will handle bundling them together.
+- Configure Webpack for development
+- In your package.json file, add a new script for running the Webpack development server:
+json
+"scripts": {
+  "dev": "webpack-dev-server --mode development"
+}
+
+Run npm run dev to start the Webpack development server, which will automatically rebuild your application when you make changes to your code.
+Configure Webpack for production
+In your package.json file, add a new script for building your application for production:
+json
+"scripts": {
+  "build": "webpack --mode production"
+}
+
+Run npm run build to create an optimized production build of your application, which will be output to the dist directory (or the directory specified in your Webpack configuration).
+
+_______________________________________________________________________
+## HTML-WEBPACK-PLUGIN ##
+Since we would like to keep all of our development work within src and leave dist for the production build (the code that you will actually deploy), 
+what about handling HTML files? -- We can use a plugin called html-webpack-plugin which will automatically build an HTML file in dist for us when we 
+build our project. It will also then automatically add certain things to the HTML like our output bundle in a <script> tag, or the code to use a 
+favicon if we configured it to use one. The resulting HTML file will essentially be the usual boilerplate with our script and perhaps any other 
+options we add in the configuration. If we had our own dist/index.html then it would be overwritten! 
+
+// webpack.config.js
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+// ...
+    plugins: [
+        new HtmlWebpackPlugin({
+            template: './src/template.html',
+        }),
+    ],
+// ...
+npm install --save-dev html-webpack-plugin
+
+HtmlWebpackPlugin Setup
+Install the HtmlWebpackPlugin:
+npm install html-webpack-plugin --save-dev
+
+Update the webpack configuration to use the HtmlWebpackPlugin:
+javascript file
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+
+module.exports = {
+  entry: './src/index.js',
+  output: {
+    filename: 'bundle.js',
+    path: path.resolve(__dirname, 'dist'),
+  },
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: './src/index.html',
+    }),
+  ],
+};
+
+The HtmlWebpackPlugin is used to automatically generate an HTML file that includes the webpack bundle(s).
+The template option specifies the path to the HTML template file that the plugin will use to generate the final HTML file.
+Loaders Configuration
+Configure the CSS loader:
+javascript
+module: {
+  rules: [
+    {
+      test: /\.css$/i,
+      use: ['style-loader', 'css-loader'],
+    },
+  ],
+}
+
+Loaders are used to handle different file types in the webpack build process.
+The CSS loader is used to process and include CSS files in the webpack bundle.
+Run Webpack
+Run webpack to bundle the code:
+bash
+npm run build
+
+Executing the webpack command will generate the bundle.js file and the index.html file in the dist directory.
+The index.html file will automatically include a script tag that references the bundle.js file.
+Using a Custom Template
+You can provide a custom HTML template for the HtmlWebpackPlugin to use:
+javascript
+new HtmlWebpackPlugin({
+  template: './src/index.html',
+  title: 'My Webpack App',
+  filename: 'custom.html',
+});
+
+The template option specifies the path to the custom HTML template file.
+The title option sets the title of the generated HTML file.
+The filename option allows you to specify a custom filename for the generated HTML file.
+
+Plugins in webpack can tap into different stages of the webpack compilation process.
+The thisCompilation hook allows a plugin to access the compilation object and perform further transformations on the assets.
+The processAssets hook is used to iterate over all the assets in the compilation and generate additional content, such as a 
+markdown file listing all the assets.
+Overall, the HTML Webpack Plugin is a powerful tool that simplifies the process of generating HTML files to serve your webpack 
+bundles, especially when dealing with hashed filenames that change on every compilation. By integrating the plugin into your 
+webpack configuration, you can ensure that your HTML files are automatically updated to reference the correct bundle files.
+
+*** DOCUMENTATION:
+https://github.com/jantimon/html-webpack-plugin
+
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+
+module.exports = {
+  entry: "index.js",
+  output: {
+    path: __dirname + "/dist",
+    filename: "index_bundle.js",
+  },
+  plugins: [new HtmlWebpackPlugin()],
+};
+
+webpack.config.js example
+{
+  entry: 'index.js',
+  output: {
+    path: __dirname + '/dist',
+    filename: 'index_bundle.js'
+  },
+  plugins: [
+    new HtmlWebpackPlugin({
+      title: 'My App',
+      filename: 'assets/admin.html'
+    })
+  ]
+}
+
+Generating Multiple HTML Files
+To generate more than one HTML file, declare the plugin more than once in your plugins array
+webpack config
+{
+  entry: 'index.js',
+  output: {
+    path: __dirname + '/dist',
+    filename: 'index_bundle.js'
+  },
+  plugins: [
+    new HtmlWebpackPlugin(), // Generates default index.html
+    new HtmlWebpackPlugin({  // Also generate a test.html
+      filename: 'test.html',
+      template: 'src/assets/test.html'
+    })
+  ]
+}
+
+_______________________________________________________________________
+## OUTPUT MANAGEMENT ##
+ <!DOCTYPE html>
+ <html>
+   <head>
+     <meta charset="utf-8" />
+    <title>Output Management</title>
+                     <script src="./print.bundle.js"></script>
+   </head>
+   <body>
+                     <script src="./index.bundle.js"></script>
+   </body>
+ </html>
+
+ webpack file:
+  const path = require('path');
+
+ module.exports = {
+                    entry: {
+                        index: './src/index.js',
+                        print: './src/print.js',
+                    },
+   output: {
+    filename: '[name].bundle.js',
+     path: path.resolve(__dirname, 'dist'),
+   },
+ };
+
+ Webpack generates our print.bundle.js and index.bundle.js files, which we also specified in our index.html file.
+ But what would happen if we changed the name of one of our entry points, or even added a new one? The generated 
+ bundles would be renamed on a build, but our index.html file would still reference the old names. Let's fix that 
+ with the HtmlWebpackPlugin.
+ npm install --save-dev html-webpack-plugin
+
+ HtmlWebpackPlugin by default will generate its own index.html file, even though we already have one in the dist/ 
+ folder. This means that it will replace our index.html file with a newly generated one. 
+
+ In general it's good practice to clean the /dist folder before each build, so that only used files will be generated. 
+ Let's take care of that with "output.clean" option.
+  const path = require('path');
+ const HtmlWebpackPlugin = require('html-webpack-plugin');
+
+ module.exports = {
+   entry: {
+     index: './src/index.js',
+     print: './src/print.js',
+   },
+   plugins: [
+     new HtmlWebpackPlugin({
+       title: 'Output Management',
+     }),
+   ],
+   output: {
+     filename: '[name].bundle.js',
+     path: path.resolve(__dirname, 'dist'),
+                                            clean: true,
+   },
+ };
+
+Webpack keeps to track how all the modules map to the output bundles. 
+WebpackManifestPlugin
+
+_______________________________________________________________________
+## Developing with Webpack ##
+
+Source Maps, a handy way to track down which source file (index.js, a.js, b.js) an error is coming from 
+when you use webpack to bundle them together. This is essential to debugging bundled code in your browser’s DevTools. 
+When webpack bundles your source code, it can become difficult to track down errors and warnings to their original location. 
+With source maps, if an error originates from b.js, the source map will tell you exactly that. There are lots of options:
+https://webpack.js.org/configuration/devtool/ -- LIST OF SOURCE MAPS
+
+Ex: Uncaught ReferenceError: cosnole is not defined
+   at HTMLButtonElement.printMe (print.js:2)
+
+Running npm run build all the time gets tiring...
+There are a couple of different options available in webpack that help you automatically compile your code whenever it changes:
+
+- webpack's Watch Mode: You can instruct webpack to "watch" all files within your dependency graph for changes. If one of these 
+files is updated, the code will be recompiled so you don't have to run the full build manually.
+package.json > scripts > "watch": "webpack --watch"
+now you run: NPM RUN WATCH instead of build 
+(npm run [some-script])
+
+- webpack-dev-server: the best option, this refreshes the page for you and everything - read the docs; The webpack-dev-server 
+provides you with a rudimentary web server and the ability to use live reloading. 
+In most cases, you probably would want to use webpack-dev-server, but let's explore all of the above options.
+npm install --save-dev webpack-dev-server
+webpack.config:
+ const path = require('path');
+ const HtmlWebpackPlugin = require('html-webpack-plugin');
+
+ module.exports = {
+   mode: 'development',
+   entry: {
+     index: './src/index.js',
+     print: './src/print.js',
+   },
+   devtool: 'inline-source-map',
+                        devServer: {
+                            static: './dist',
+                        },
+   plugins: [
+     new HtmlWebpackPlugin({
+       title: 'Development',
+     }),
+   ],
+   output: {
+     filename: '[name].bundle.js',
+     path: path.resolve(__dirname, 'dist'),
+     clean: true,
+   },
+                        optimization: {
+                            runtimeChunk: 'single',
+                        },
+ };
+ package.json > scripts > "start": "webpack serve --open",
+ https://webpack.js.org/configuration/dev-server/ -- DOCUMENTATION
+
+ module.exports = {
+  //...
+  devServer: {
+    watchFiles: {
+      paths: ['src/**/*.php', 'public/**/*'],  // the types of files to be watched
+      options: {
+        usePolling: false,
+      },
+    },
+  },
+};
+
+- webpack-dev-middleware: webpack-dev-middleware is a wrapper that will emit files processed by webpack to a 
+server. This is used in webpack-dev-server internally, however it's available as a separate package to allow 
+more custom setups if desired. 
+npm install --save-dev express webpack-dev-middleware
+webpack.config:
+output >  publicPath: '/',
+
+const express = require('express');
+const webpack = require('webpack');
+const webpackDevMiddleware = require('webpack-dev-middleware');
+
+const app = express();
+const config = require('./webpack.config.js');
+const compiler = webpack(config);
+
+// Tell express to use the webpack-dev-middleware and use the webpack.config.js
+// configuration file as a base.
+app.use(
+  webpackDevMiddleware(compiler, {
+    publicPath: config.output.publicPath,
+  })
+);
+
+// Serve the files on port 3000.
+app.listen(3000, function () {
+  console.log('Example app listening on port 3000!\n');
+});
+
+package.json > scripts > "server": "node server.js",
+
+## PRODUCTION WEBPACK ##
+The goals of development and production builds differ greatly. In development, we want strong source mapping and a 
+localhost server with live reloading or hot module replacement. In production, our goals shift to a focus on minified 
+bundles, lighter weight source maps, and optimized assets to improve load time. So we want to keep separate configurations, 
+but we also don't want to repeat ourselves... enter webpack-merge
+npm install --save-dev webpack-merge
+
+webpack.common.js
+
+ const path = require('path');
+ const HtmlWebpackPlugin = require('html-webpack-plugin');
+
+ module.exports = {
+   entry: {
+     app: './src/index.js',
+   },
+   plugins: [
+     new HtmlWebpackPlugin({
+       title: 'Production',
+     }),
+   ],
+   output: {
+     filename: '[name].bundle.js',
+     path: path.resolve(__dirname, 'dist'),
+     clean: true,
+   },
+ };
+webpack.dev.js
+
+ const { merge } = require('webpack-merge');
+ const common = require('./webpack.common.js');
+
+ module.exports = merge(common, {
+   mode: 'development',
+   devtool: 'inline-source-map',
+   devServer: {
+     static: './dist',
+   },
+ });
+webpack.prod.js
+
+ const { merge } = require('webpack-merge');
+ const common = require('./webpack.common.js');
+
+ module.exports = merge(common, {
+   mode: 'production',
+ });
+
+
+Minification
+Webpack v4+ will minify your code by default in production mode.
+
+We encourage you to have source maps enabled in production, as they are useful for debugging as well as running benchmark tests. 
+
+Code splitting is one of the most compelling features of webpack. This feature allows you to split your code into various bundles 
+which can then be loaded on demand or in parallel. It can be used to achieve smaller bundles and control resource load prioritization 
+which, if used correctly, can have a major impact on load time.
+
+When working with packages that are installed with npm, you don’t need to track the contents of node_modules with git, nor push 
+those files to GitHub. This is because the package.json file contains all the information, so that anyone can clone your project 
+and install them on their machine with npm install.
+
+When working with packages that are installed with npm, you don’t need to track the contents of node_modules with git, nor push 
+those files to GitHub. This is because the package.json file contains all the information, so that anyone can clone your project 
+and install them on their machine with npm install.
+You can make a .gitignore file in the root of the project, and by writing file or directory names in it, you can tell git what 
+things you don’t want to track. It’s customary to add node_modules to .gitignore, since it can get really big. 
