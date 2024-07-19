@@ -1,0 +1,428 @@
+This is about code style and cinsistency with code styling. 
+Code style is important! Having a consistent set of style rules for things such as indentation or preferred quote style makes your code more maintainable and easier to read.
+
+Linters are tools that will scan your code with a set of style rules and will report any errors to you that they find. In some cases, they can even auto-fix the errors! JavaScript linters are tools that you can use to help you debug your code. They scan your scripts for common issues and errors, and give you back a report with line numbers that you can use to fix things.
+
+
+## ESLINT ##
+There are multiple options for linting your JavaScript, but the most popular (and most common in the industry) is ESLint.
+
+There is an ESLint extension for Visual Studio Code with which you can get automatic lint highlighting for your files as you write, without you needing to rerun the eslint command every time.
+
+The three most popular JS linters are:
+JSLint: Highly opinionated and based on Douglas Crockford’s Javascript: The Good Parts, it does not allow for much configuration.
+JSHint: Comes loaded with sensible defaults, but allows for a lot more configuration than JSLint.
+ESLint: An extremely configurable linter that also supports JSX and can autoformat scripts to match your preferred code formatting style.
+
+Linting code is already an established part of any (popular) JavaScript project and, in my opinion, has a lot of benefits such as:
+
+Readability
+Pre-code review
+Finding (syntax) errors before execution
+As we have the possibility to define a set of styling rules, this increases the readability of our code towards the effort of having our codebase look like it was written by “one person”. This is important, as it can happen that software engineers move from codebase to codebase within projects meaning a lot of people become involved. A common set of rules makes it easier to really understand what the code is doing.
+
+How to run ESLint:
+- npm init @eslint/config@latest
+- npx eslint yourfile.js
+
+
+// in your eslint.config.js file (you can use files or comments to configure your ESLint preferences)
+import js from "@eslint/js";
+export default [
+    js.configs.recommended,
+
+    {
+        rules: {
+            "no-unused-vars": "warn",
+            "no-undef": "warn"
+        }
+    }
+];
+
+another example: 
+export default [ // the two sets of rules will be emrged together
+    {
+        rules: {
+            semi: ["error", "never"]
+        }
+    },
+    {
+        rules: {
+            semi: ["warn", "always"]
+        }
+    }
+];
+Using this configuration, the final rule configuration for semi is ["warn", "always"] because it appears last in the array. 
+
+
+-- The names "no-unused-vars" and "no-undef" are the names of rules in ESLint. The first value is the error level of the rule and can be one of these values:
+
+"off" or 0 - turn the rule off
+"warn" or 1 - turn the rule on as a warning (doesn’t affect exit code)
+"error" or 2 - turn the rule on as an error (exit code will be 1)
+The three error levels allow you fine-grained control over how ESLint applies rules (for more configuration options and details, see the configuration docs).
+
+It is also possible to install ESLint globally, rather than locally, using npm install eslint --global. However, this is NOT recommended, and any plugins or shareable configs that you use must still be installed locally if you install ESLint globally.
+
+only with basic syntax validation or mix and match the bundled rules and your custom rules to fit the needs of your project. There are two primary ways to configure ESLint:
+
+Configuration Comments - use JavaScript comments to embed configuration information directly into a file.
+Configuration Files - use a JavaScript file to specify configuration information for an entire directory and all of its subdirectories. This can be in the form of an eslint.config.js file which ESLint will look for and read automatically, or you can specify a configuration file on the command line.
+Here are some of the options that you can configure in ESLint:
+
+Globals - the additional global variables your script accesses during execution.
+Rules - which rules are enabled and at what error level. (Rules are the core building block of ESLint. )
+Plugins - which third-party plugins define additional rules, environments, configs, etc. for ESLint to use.
+
+-- Using configuration comments
+To configure rules inside of a file using configuration comments, use a comment in the following format:
+/* eslint eqeqeq: "off", curly: "error" */
+In this example, eqeqeq is turned off and curly is turned on as an error. You can also use the numeric equivalent for the rule severity:
+/* eslint eqeqeq: 0, curly: 2 */
+This example is the same as the last example, only it uses the numeric codes instead of the string values. The eqeqeq rule is off and the curly rule is set to be an error.
+If a rule has additional options, you can specify them using array literal syntax, such as:
+/* eslint quotes: ["error", "double"], curly: 2 */
+This comment specifies the “double” option for the quotes rule. The first item in the array is always the rule severity (number or string).
+
+- EXAMPLE
+Configuration Comment Descriptions
+Configuration comments can include descriptions to explain why the comment is necessary. The description must occur after the configuration and is separated from the configuration by two or more consecutive - characters. For example:
+
+/* eslint eqeqeq: "off", curly: "error" -- Here's a description about why this configuration is necessary. */
+
+/* eslint eqeqeq: "off", curly: "error"
+    --------
+    Here's a description about why this configuration is necessary. */
+
+
+
+/* eslint eqeqeq: "off", curly: "error"
+ * --------
+ * This will not work due to the line above starting with a '*' character.
+ */
+
+
+**Important**
+Rules configured via configuration comments have the highest priority and are applied after all configuration files settings.
+
+**Rules From Plugin**
+Rules from Plugins
+To configure a rule that is defined within a plugin, prefix the rule ID with the plugin namespace and /.
+
+In a configuration file, for example:
+
+// eslint.config.js
+import example from "eslint-plugin-example";
+
+export default [
+    {
+        plugins: {
+            example
+        },
+        rules: {
+            "example/rule1": "warn"
+        }
+    }
+];
+
+In this configuration file, the rule example/rule1 comes from the plugin named eslint-plugin-example.
+
+You can also use this format with configuration comments, such as:
+
+/* eslint "example/rule1": "error" */
+
+**Disabling configuration rules**
+To disable rule warnings in a part of a file, use block comments in the following format:
+/* eslint-disable */
+
+alert('foo');
+
+/* eslint-enable */
+
+
+* PRETTIER *
+Prettier will take your JS code and then automatically format it according to a set of rules. Unlike a linter, it’s not looking for style errors, but specifically targeting the layout of your code and making intelligent decisions about things like spaces, indentation levels and line-breaks.
+
+
+**SETUP**
+For most people using the default ESLint ruleset, there will be no special setup needed apart from installing both of them.
+
+Some community plugins, such as eslint-config-airbnb-base, turn on some stylistic rules that may clash with what Prettier formats. If you wish to use a plugin like eslint-config-airbnb-base and Prettier together, you will also need to install eslint-config-prettier which will turn off any of the ESLint rules that clash with Prettier. If you are using the default ESLint ruleset, you will not need this.
+
+**GITHUB TEMPLATE REPOSITORIES**
+This is where template repositories can come very much in handy. Any of your existing repositories can be converted to a template in its settings (right under where you can rename the repository, there is a checkbox for whether the repository is a template or not). If you check this box, congratulations, that’s all you need to do! Now when you go to create a new repository, the Repository template dropdown will have any templates listed for you to select. Selecting one will mean your new repository will be a copy of the chosen template, not an empty one!
+
+If you find yourself reusing a lot of setup code for multiple projects, you can make a new repository with all of the setup code you need then mark it as a template. Now you can select that template when creating a new project repository to save time getting set up, letting you dive into working on the project itself sooner!
+
+
+**DYNAMIC USER INTERFACES**
+
+## JS Form Validation ##
+Client-side validation should not be considered an exhaustive security measure! Your apps should always perform security checks on any form-submitted data on the server-side as well as the client-side, because client-side validation is too easy to bypass, so malicious users can still easily send bad data through to your server.
+
+Why do we insist on validating our forms? There are three main reasons:
+1. We want to get the right data, in the right format. Our applications won't work properly if our users' data is stored in the wrong format, is incorrect, or is omitted altogether.
+2. We want to protect our users' data. Forcing our users to enter secure passwords makes it easier to protect their account information.
+3. We want to protect ourselves. There are many ways that malicious users can misuse unprotected forms to damage the application.
+
+NEVER trust data passed to your server from the client. 
+
+TWO kinds of validation: form validation and JavaScript validation which is more customizable.  
+You must use JavaScript if you want to take control over the look and feel of native error messages.
+
+* Constraint Validation API *
+The Constraint Validation API consists of a set of methods and properties available on the following form element DOM interfaces:
+HTMLButtonElement (represents a <button> element)
+HTMLFieldSetElement (represents a <fieldset> element)
+HTMLInputElement (represents an <input> element)
+HTMLOutputElement (represents an <output> element)
+HTMLSelectElement (represents a <select> element)
+HTMLTextAreaElement (represents a <textarea> element)
+Basically these elements have methods and properties built in that you can access and use in your validation process. For example: 'validity', 'willValidate', tooShhort, tooLong, valid, typeMismatch, etc. Some methods available on the form as well. 
+
+The built-in automated messages have two drawbacks:
+1. There is no standard way to change their look and feel with CSS.
+2. They depend on the browser locale, which means that you can have a page in one language but an error message displayed in another language, as seen in the following Firefox screenshot. 
+*** Customizing these error messages is one of the most common use cases of the Constraint Validation API.
+
+<form>
+  <label for="mail">
+    I would like you to provide me with an email address:
+  </label>
+  <input type="email" id="mail" name="mail" />
+  <button>Submit</button>
+</form>
+
+const email = document.getElementById("mail");
+email.addEventListener("input", (event) => {
+  if (email.validity.typeMismatch) {
+    email.setCustomValidity("I am expecting an email address!");
+  } else {
+    email.setCustomValidity("");
+  }
+});
+
+Inside the contained code, we check whether the email input's validity.typeMismatch property returns true, meaning that the contained value doesn't match the pattern for a well-formed email address. If so, we call the setCustomValidity() method with a custom message. This renders the input invalid, so that when you try to submit the form, submission fails and the custom error message is displayed.
+
+Another example:
+<form novalidate> <<-- what is this? See below. 
+  <p>
+    <label for="mail">
+      <span>Please enter an email address:</span>
+      <input type="email" id="mail" name="mail" required minlength="8" />
+      <span class="error" aria-live="polite"></span> -- The aria-live attribute is set on that <span> to make sure that our custom error message will be presented to everyone, including it being read out to screen reader users.
+    </label>
+  </p>
+  <button>Submit</button>
+</form>
+
+"noValidate" turns OFF the browser's automatic validation. This lets our JS take control of the validation. However, this doesn't disable support for the constraint validation API nor the application of CSS pseudo-classes like :valid, etc. That means that even though the browser doesn't automatically check the validity of the form before sending its data, you can still do it yourself and style the form accordingly.
+
+The code comments explain things pretty well, but briefly:
+- Every time we change the value of the input, we check to see if it contains valid data. If it has then we remove any error message being shown. If the data is not valid, we run showError() to show the appropriate error.
+- Every time we try to submit the form, we again check to see if the data is valid. If so, we let the form submit. If not, we run showError() to show the appropriate error, and stop the form submitting with preventDefault().
+- The showError() function uses various properties of the input's validity object to determine what the error is, and then displays an error message as appropriate.
+
+An example that doesn't use the constraint validation API:
+<form>
+  <p>
+    <label for="mail">
+      <span>Please enter an email address:</span>
+      <input type="text" id="mail" name="mail" />
+      <span class="error" aria-live="polite"></span>
+    </label>
+  </p>
+  <button>Submit</button>
+</form>
+
+body {
+  font: 1em sans-serif;
+  width: 200px;
+  padding: 0;
+  margin: 0 auto;
+}
+
+form {
+  max-width: 200px;
+}
+
+p * {
+  display: block;
+}
+
+input#mail {
+  appearance: none;
+  width: 100%;
+  border: 1px solid #333;
+  margin: 0;
+
+  font-family: inherit;
+  font-size: 90%;
+
+  box-sizing: border-box;
+}
+
+/* This is our style for the invalid fields */
+input.invalid {
+  border-color: #900;
+  background-color: #fdd;
+}
+
+input:focus:invalid {
+  outline: none;
+}
+
+/* This is the style of our error messages */
+.error {
+  width: 100%;
+  padding: 0;
+
+  font-size: 80%;
+  color: white;
+  background-color: #900;
+  border-radius: 0 0 5px 5px;
+  box-sizing: border-box;
+}
+
+.error.active {
+  padding: 0.3em;
+}
+
+const form = document.querySelector("form");
+const email = document.getElementById("mail");
+const error = email.nextElementSibling;
+
+// As per the HTML Specification
+const emailRegExp =
+  /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+
+// Now we can rebuild our validation constraint
+// Because we do not rely on CSS pseudo-class, we have to
+// explicitly set the valid/invalid class on our email field
+window.addEventListener("load", () => {
+  // Here, we test if the field is empty (remember, the field is not required)
+  // If it is not, we check if its content is a well-formed email address.
+  const isValid = email.value.length === 0 || emailRegExp.test(email.value);
+  email.className = isValid ? "valid" : "invalid";
+});
+
+// This defines what happens when the user types in the field
+email.addEventListener("input", () => {
+  const isValid = email.value.length === 0 || emailRegExp.test(email.value);
+  if (isValid) {
+    email.className = "valid";
+    error.textContent = "";
+    error.className = "error";
+  } else {
+    email.className = "invalid";
+  }
+});
+
+// This defines what happens when the user tries to submit the data
+form.addEventListener("submit", (event) => {
+  event.preventDefault();
+
+  const isValid = email.value.length === 0 || emailRegExp.test(email.value);
+  if (!isValid) {
+    email.className = "invalid";
+    error.textContent = "I expect an email, darling!";
+    error.className = "error active";
+  } else {
+    email.className = "valid";
+    error.textContent = "";
+    error.className = "error";
+  }
+});
+
+ There are many libraries available to perform form validation, such as Validate.js. 
+
+ Using JavaScript and the Constraint API, it is possible to implement more complex constraints, for example, constraints combining several fields, or constraints involving complex calculations.
+Basically, the idea is to trigger JavaScript on some form field event (like onchange) to calculate whether the constraint is violated, and then to use the method field.setCustomValidity() to set the result of the validation: an empty string means the constraint is satisfied, and any other string means there is an error and this string is the error message to display to the user.
+
+function checkFileSize() {
+  const FS = document.getElementById("FS");
+  const files = FS.files;
+
+  // If there is (at least) one file selected
+  if (files.length > 0) {
+    if (files[0].size > 75 * 1024) {
+      // Check the constraint
+      FS.setCustomValidity("The selected file must not be larger than 75 kB");
+      FS.reportValidity();
+      return;
+    }
+  }
+  // No custom constraint violation
+  FS.setCustomValidity("");
+}
+window.onload = () => {
+  document.getElementById("FS").onchange = checkFileSize;
+};
+
+:required and :optional CSS pseudo-classes
+The :required and :optional pseudo-classes allow writing selectors that match form elements that have the required attribute, or that don't have it.
+
+:placeholder-shown CSS pseudo-class
+See :placeholder-shown.
+
+:valid :invalid CSS pseudo-classes
+The :valid and :invalid pseudo-classes are used to represent <input> elements whose content validates and fails to validate respectively according to the input's type setting. These classes allow the user to style valid or invalid form elements to make it easier to identify elements that are either formatted correctly or incorrectly.
+
+## ES6 - Babel SetUp ##
+npm install -D babel-loader @babel/core @babel/preset-env webpack
+npx babel input.js --out-file output.js
+
+*** If you open output.js, you’ll see that nothing has changed. It’s exactly the same content as input.js. That’s not what you expected, was it? The reason for this is that Babel doesn’t do anything out-of-the-box but Babel is built on presets and plugins. If you don’t add any presets or plugins, then Babel will do nothing.
+Babel doesn't do anything out of the box - it's the babel plugin that does the work
+
+for example: npm install --save-dev @babel/plugin-transform-arrow-functions
+Each plugin is its own NPM package
+
+{
+  "plugins": ["@babel/plugin-transform-arrow-functions"]
+}
+const hello = () => console.log("hello world!")
+becomes
+const hello = function () {
+  return console.log("hello world!");
+};
+
+BUT if you want to use more ES6 features you would need to install one NPM package and add an entry in .babelrc for every feature. That’s just too much work. But there is a solution to this: presets!
+The Babel foundation has created presets that contains common bundles of plugins. That means you only have to do the NPM installation and babel configuration once and then a bunch of plugins are automatically installed for you.
+The official presets are:
+@babel/preset-env
+@babel/preset-flow
+@babel/preset-react
+@babel/preset-typescript
+
+npm install --save-dev @babel/preset-env
+{
+  "presets": ["@babel/preset-env"]
+}
+
+You can also, for example, say you don’t support IE by adding the following to your .browserlistrc file:
+
+not ie all
+or that you define that you only support browsers with a market share of 0.25% or more:
+
+>0.25%
+
+
+https://github.com/babel/babel-loader
+
+module: {
+  rules: [
+    {
+      test: /\.(?:js|mjs|cjs)$/,
+      exclude: /node_modules/,
+      use: {
+        loader: 'babel-loader',
+        options: {
+          presets: [
+            ['@babel/preset-env', { targets: "defaults" }]
+          ]
+        }
+      }
+    }
+  ]
+}

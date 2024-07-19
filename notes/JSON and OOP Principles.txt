@@ -132,9 +132,9 @@ document.getElementById("demo").innerHTML = obj.name + ", " + obj.age();
 AVOID using functions in JSON; 
 
 
-## OOP Principles ##
+## OOP Principles s##
 
--- Single Responsibility: a class (or object or module… you get the point) should only have one responsibility.
+-- Single Responsibility : a class (or object or module… you get the point) should only have one responsibility.
 Here’s a really common example. Most of our code has functions to update and write things to the DOM in addition
  to our application logic. It’s a REALLY good idea to separate your DOM stuff from the application logic.
 

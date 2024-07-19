@@ -26,7 +26,7 @@ Unscoped packages are always public. Private packages are always scoped. Scoped 
 default; you must pass a command-line flag when publishing to make them public. 
 
 _______________________________________________________________________
-## ES6 MODULES ## also known as ESM
+## ES6 MODULES also known as ESM ##
 2 Components: import and export
 IMPORT:
 // a file called functionOne.js
