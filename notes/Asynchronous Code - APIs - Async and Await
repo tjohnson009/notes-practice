@@ -1,0 +1,341 @@
+## Callbacks ##
+These were what were used mostly in the past when dealign with asynchronous code.
+A callback function is a function passed into another function as an argument, which is then invoked inside the outer function to complete some kind of routine or action. Callbacks are functions that get passed into other functions. Think about event listeners. 
+
+myDiv.addEventListener("click", function(){
+  // do something!
+})
+Here, the function addEventListener() takes a callback (the “do something” function) and then calls it when myDiv gets clicked.
+Using callbacks can get out of hand, especially when you need to chain several of them together in a specific order.
+
+## Callback Hell--:
+fs.readdir(source, function (err, files) {
+  if (err) {
+    console.log('Error finding files: ' + err)
+  } else {
+    files.forEach(function (filename, fileIndex) {
+      console.log(filename)
+      gm(source + filename).size(function (err, values) {
+        if (err) {
+          console.log('Error identifying file size: ' + err)
+        } else {
+          console.log(filename + ' : ' + values)
+          aspect = (values.width / values.height)
+          widths.forEach(function (width, widthIndex) {
+            height = Math.round(width / aspect)
+            console.log('resizing ' + filename + 'to ' + height + 'x' + height)
+            this.resize(width, height).write(dest + 'w' + width + '_' + filename, function(err) {
+              if (err) console.log('Error writing file: ' + err)
+            })
+          }.bind(this))
+        }
+      })
+    })
+  }
+})
+
+The cause of callback hell is when people try to write JavaScript in a way where execution happens visually from top to bottom. That might be true for languages like C and Rust, but not JavaScript. Functions that are async and use callbacks don't return anything right away. 
+var photo = downloadPhoto('http://coolcats.com/cat.gif')
+// photo is 'undefined'!
+Instead, you store the code that should run after the download is complete in a function. This is the callback. 
+downloadPhoto('http://coolcats.com/cat.gif', handlePhoto)
+
+function handlePhoto (error, photo) {
+  if (error) console.error('Download error!', error)
+  else console.log('Download finished', photo)
+}
+
+console.log('Download started')
+In this example three major things happen. First the handlePhoto function is declared, then the downloadPhoto function is invoked and passed the handlePhoto as its callback, and finally 'Download started' is printed out.
+Note that the handlePhoto is not invoked yet, it is just created and passed as a callback into downloadPhoto. But it won't run until downloadPhoto finishes doing its task, which could take a long time depending on how fast the Internet connection is.
+The handlePhoto callback is just a way to store some things to do at a later time
+The order in which things happen does not read top-to-bottom, it jumps around based on when things complete
+
+HOW TO FIX CALL BACK HELL: 
+1. Keep your code shallow. When we name our functions, then we can name them and move the function calls to the top of our program and have the defiinitions to the bottom of our file. 
+var form = document.querySelector('form')
+form.onsubmit = function formSubmit (submitEvent) {
+  var name = document.querySelector('input').value
+  request({
+    uri: "http://example.com/upload",
+    body: name,
+    method: "POST"
+  }, function postResponse (err, response, body) {
+    var statusMessage = document.querySelector('.status')
+    if (err) return statusMessage.value = err
+    statusMessage.value = body
+  })
+}
+2. Make your code modular aka create modules for separate pieces of code.
+Write small modules that each do one thing, and assemble them into other modules that do a bigger thing. You can't get into callback hell if you don't go there.
+
+Here is a new file called formuploader.js: 
+module.exports.submit = formSubmit
+function formSubmit (submitEvent) {
+  var name = document.querySelector('input').value
+  request({
+    uri: "http://example.com/upload",
+    body: name,
+    method: "POST"
+  }, postResponse)
+}
+
+function postResponse (err, response, body) {
+  var statusMessage = document.querySelector('.status')
+  if (err) return statusMessage.value = err
+  statusMessage.value = body
+}
+
+var formUploader = require('formuploader')
+document.querySelector('form').onsubmit = formUploader.submit
+
+Now our application is only two lines of code and has the following benefits:
+    1. easier for new developers to understand -- they won't get bogged down by having to read through all of the formuploader functions
+    2. formuploader can get used in other places without duplicating code and can easily be shared on github or npm
+
+3. Handle every single error. 
+## Summary of Callback Hell ##
+- Don't nest functions. Give them names and place them at the top level of your program
+- Use function hoisting to your advantage to move functions 'below the fold'
+- Handle every single error in every one of your callbacks. Use a linter like standard to help you with this.
+- Create reusable functions and place them in a module to reduce the cognitive load required to understand your code. Splitting your code into small pieces like this also helps you handle errors, write tests, forces you to create a stable and documented public API for your code, and helps with refactoring.
+The MOST IMPORTANT aspect of avoiding callback hell is moving functions out of the way so that the programs flow can be more easily understood without newcomers having to wade through all the detail of the functions to get to the meat of what the program is trying to do.
+
+You can start by moving the functions to the bottom of the file, then graduate to moving them into another file that you load in using a relative require like require('./photo-helpers.js') and then finally move them into a standalone module like require('image-resize').
+
+Here are some rules of thumb when creating a module:
+- Start by moving repeatedly used code into a function
+- When your function (or a group of functions related to the same theme) get big enough, move them into another file and expose them using module.exports. You can load this using a relative require
+- If you have some code that can be used across multiple projects give it it's own readme, tests and package.json and publish it to github and npm. There are too many awesome benefits to this specific approach to list here!
+- A good module is small and focuses on one problem
+- Individual files in a module should not be longer than around 150 lines of JavaScript
+- A module shouldn't have more than one level of nested folders full of JavaScript files. If it does, it is probably doing too many things
+- Ask more experienced coders you know to show you examples of good modules until you have a good idea of what they look like. If it takes more than a few minutes to understand what is happening, it probably isn't a very good module.
+
+
+Callbacks are functions that are executed asynchronously, or at a later time. Instead of the code reading top to bottom procedurally, async programs may execute different functions at different times based on the order and speed that earlier functions like http requests or file system reads happen.
+
+Node, however, uses mostly asynchronous code. Let's use node to read our number from a file called number.txt:
+var fs = require('fs') // require is a special function provided by node
+var myNumber = undefined // we don't know what the number is yet since it is stored in a file
+
+function addOne() {
+  fs.readFile('number.txt', function doneReading(err, fileContents) {
+    myNumber = parseInt(fileContents)
+    myNumber++
+  })
+}
+
+addOne()
+
+console.log(myNumber) // logs out undefined -- this line gets run before readFile is done
+Why do we get undefined when we log out the number this time? In this code we use the fs.readFile method, which happens to be an asynchronous method. Usually things that have to talk to hard drives or networks will be asynchronous. If they just have to access things in memory or do some work on the CPU they will be synchronous. The reason for this is that I/O is reallyyy reallyyy sloowwww. A ballpark figure would be that talking to a hard drive is about 100,000 times slower than talking to memory (e.g. RAM).
+
+## PROMISES ##
+There are multiple ways that you can handle asynchronous code in JavaScript, and they all have their use cases. Asynchronous code is generally better for performance and flexibility. Essentially, a promise is an object that might produce a value at some point in the future. Its arguments resolve and reject are callbacks provided by JavaScript itself.
+
+const getData = function() {
+  // go fetch data from some API...
+  // clean it up a bit and return it as an object:
+  return data
+}
+const myData = getData()
+const pieceOfData = myData['whatever']
+This will be undefined because the data will not have returned yet... we need a way to tell our code to wait for the returned data. Enter Promises.  
+
+The promise object returned by the new Promise constructor has these internal properties:
+state — initially "pending", then changes to either "fulfilled" when resolve is called or "rejected" when reject is called.
+result — initially undefined, then changes to value when resolve(value) is called or error when reject(error) is called. A promise that is either resolved or rejected is called “settled”, as opposed to an initially “pending” promise. The properties state and result of the Promise object are internal. We can’t directly access them. We can use the methods .then/.catch/.finally for that. 
+
+let promise = new Promise(function(resolve, reject) { // single results only
+  resolve("done");
+
+  reject(new Error("…")); // ignored
+  setTimeout(() => resolve("…")); // ignored
+});
+
+
+const myData = getData() // if this is refactored to return a Promise...
+myData.then(function(data){ // .then() tells it to wait until the promise is resolved
+  const pieceOfData = data['whatever'] // and THEN run the function inside
+})
+
+- Aside: Testing promises is probably easier than you think because setTimeout can be used as your async "task".
+
+var p = new Promise(function(resolve, reject) {
+	// Do an async task async task and then...
+	if (/* good condition */) {
+		resolve('Success!');
+	} else {
+		reject('Failure!');
+	}
+});
+
+p.then(function(result) { 
+	/* do something with the result */
+})
+.catch(function() { // if the promise is rejected
+	/* error :( */
+}).finally(function() {
+   /* executes regardless or success for failure */ 
+});
+
+Sometimes, you might not always NEED to do something that takes time. But if there's a chance that you might, it's good to always return a promise. This way, whoever is using your function knows they can expect a promise every time. If you don't actually have an async task to perform, but you still want to return a promise, you can use Promise.resolve() to quickly create a promise that is already done. If something went wrong, you can use Promise.reject() to create a promise that has already failed. When writing functions that might do something that takes time, it's helpful to always return a promise.
+
+- .then() and .catch(): All promise instances get a then method which allows you to react to the promise.  The first then method callback receives the result given to it by the resolve() call. Resolve can be thought of as whatever gets passed into the .then() method
+
+new Promise(function(resolve, reject) {
+	// A mock async action using setTimeout
+	setTimeout(function() { resolve(10); }, 3000);
+}).then(function(result) {
+	console.log(result);
+});
+
+// From the console:
+// 10
+
+Multiple .then() methods: 
+new Promise(function(resolve, reject) { 
+	// A mock async action using setTimeout
+	setTimeout(function() { resolve(10); }, 3000);
+})
+.then(function(num) { console.log('first then: ', num); return num * 2; }) // Each recives the value of the previous .then()
+.then(function(num) { console.log('second then: ', num); return num * 2; })
+.then(function(num) { console.log('last then: ', num);});
+
+// From the console:
+// first then:  10
+// second then:  20
+// last then:  40
+
+If a promise has already resolved but then is called again, the callback immediately fires. If the promise is rejected and you call then after rejection, the callback is never called.
+
+new Promise(function(resolve, reject) {
+	// A mock async action using setTimeout
+	setTimeout(function() { reject('Done!'); }, 3000);
+})
+.then(function(e) { console.log('done', e); })
+.catch(function(e) { console.log('catch: ', e); });
+
+// From the console:
+// 'catch: Done!'
+Example: reject(Error('Data could not be found'));
+
+- .finally(): The finally callback is called regardless of success or failure. 
+(new Promise((resolve, reject) => { reject("Nope"); }))
+    .then(() => { console.log("success") })
+    .catch(() => { console.log("fail") })
+    .finally(res => { console.log("finally") });
+
+// >> fail
+// >> finally
+
+** The idea of finally is to set up a handler for performing cleanup/finalizing after the previous operations are complete. E.g. stopping loading indicators, closing no longer needed connections, etc. 
+
+new Promise((resolve, reject) => {
+  /* do something that takes time, and then call resolve or maybe reject */
+})
+  // runs when the promise is settled, doesn't matter successfully or not
+  .finally(() => stop loading indicator)
+  // so the loading indicator is always stopped before we go on
+  .then(result => show result, err => show error)
+
+  Please note that finally(f) isn’t exactly an alias of then(f,f) though.
+
+There are important differences:
+A finally handler has no arguments. In finally we don’t know whether the promise is successful or not. That’s all right, as our task is usually to perform “general” finalizing procedures. Please take a look at the example above: as you can see, the finally handler has no arguments, and the promise outcome is handled by the next handler. A finally handler “passes through” the result or error to the next suitable handler.
+
+For instance, here the result is passed through finally to then:
+new Promise((resolve, reject) => {
+  setTimeout(() => resolve("value"), 2000);
+})
+  .finally(() => alert("Promise ready")) // triggers first
+  .then(result => alert(result)); // <-- .then shows "value"
+- finally is NOT meant to process a promise result. As said, it’s a place to do generic cleanup, no matter what the outcome was. A finally handler also shouldn’t return anything. If it does, the returned value is silently ignored. To summarize:
+- A finally handler doesn’t get the outcome of the previous handler (it has no arguments). This outcome is passed through instead, to the next suitable handler.
+- If a finally handler returns something, it’s ignored.
+- When finally throws an error, then the execution goes to the nearest error handler.
+
+
+- Promise.all():
+Think about JavaScript loaders:  there are times when you trigger multiple async interactions but only want to respond when all of them are completed -- that's where Promise.all comes in.  The Promise.all method takes an array of promises and fires one callback once they are all resolved. 
+
+Promise.all([promise1, promise2]).then(function(results) {
+	// Both promises resolved
+})
+.catch(function(error) {
+	// One or more promises was rejected
+});
+
+A perfect way of thinking about Promise.all is firing off multiple AJAX (via fetch) requests at once. 
+var request1 = fetch('/users.json');
+var request2 = fetch('/articles.json');
+
+Promise.all([request1, request2]).then(function(results) {
+	// Both promises done!
+});
+
+Promise.all([fetch('/users.json'), navigator.getBattery()]).then(function(results) {
+	// Both promises done!
+});
+Promise.all() will be super useful as more APIs move toward promises.
+
+- Promise.race(): Promise.race is an interesting function -- instead of waiting for all promises to be resolved or rejected, Promise.race triggers as soon as any promise in the array is resolved or rejected. 
+var req1 = new Promise(function(resolve, reject) { 
+	// A mock async action using setTimeout
+	setTimeout(function() { resolve('First!'); }, 8000);
+});
+var req2 = new Promise(function(resolve, reject) { 
+	// A mock async action using setTimeout
+	setTimeout(function() { resolve('Second!'); }, 3000);
+});
+Promise.race([req1, req2]).then(function(one) {
+	console.log('Then: ', one);
+}).catch(function(one, two) {
+	console.log('Catch: ', one);
+});
+
+// From the console:
+// Then: Second!
+*** A use case could be triggering a request to a primary source and a secondary source (in case the primary or secondary are unavailable).
+
+Another example: 
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+delay(3000).then(() => alert('runs after 3 seconds'));
+
+Differences between Promises and Callbacks:
+Promises allow us to do things in the natural order. First, we run loadScript(script), and .then we write what to do with the result.
+We can call .then on a Promise as many times as we want. Each time, we’re adding a new “fan”, a new subscribing function, to the “subscription list”. More about this in the next chapter: Promises chaining.
+With callbacks, we must have a callback function at our disposal when calling loadScript(script, callback). In other words, we must know what to do with the result before loadScript is called. There can be only one callback. A call back is any function we pass into another function as an argument. 
+
+2 parts to any promise: the promise maker and the promise receiver:
+MAKER: function getWeather() {
+    return new Promise((resolve, reject) => {
+
+    })
+}
+RECEIVER: 
+let promise = getWeather().then(resolve, reject)
+
+## Event Loop ##:
+How does JS even work? 
+The Call Stack: one thread == one call stack == one thing at a time
+The call stack calls function when they are on thhe stack and when the function returns, we pop them off the call stack. 
+What is blocking? What happens when things are slow? They block other tasks that are on the stack. Thid is a problem because of browsers. EWhile we wait for these syynchronous tasks, we cannot do anything else in the browser. 
+Enter ashynchronous callbacks. 
+
+CONCURRENCY and the Event Loop - one thing at a time, except not really. 
+The browser is more than just the runtime. It also includes the webAPIs, the callback/task queue, and the event loop. 
+
+console.log('hi); 
+setTimeout(() => console.log('hey'), 5000); 
+console.log('JSConfEU'); 
+
+When WebAPIs finish running, they push your task onto the task/callback queue.  
+The event loops job is to look at the stack and the task queue - if the stack is empty, it takes the first thing from the queue and pushes it onto the call stack. IF setTimeout was set to run immediately qwith no delay, it essentially pushes that code until the back of the queue. SetTimeout is not a guarantee of execution, it's the minimum time to execution. 
+
+
+## APIs ##
+
