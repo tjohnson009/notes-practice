@@ -1,2 +1,4 @@
 Webpack 
 NPM
+
+Words for personality assessments like Birkman, Working Genius, StrengthFinders, etc

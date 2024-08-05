@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+</head>
+<body>
+  <img src="#">
+  <input type="text" class="search" id='input' placeholder="Search for GIFs">
+  <script>
+      let input = document.querySelector('#input'); 
+      const img = document.querySelector('img');
+      
+      img.src = '';
+      img.alt = 'No image found yet...'; 
+      function getNewGif() {
+          if (input.value.length >= 3) {
+            fetch(`https://api.giphy.com/v1/gifs/translate?api_key=IGYD4m9MfpWjhMI52ZZa6JsoqjuDPE7J&s=${input.value}`, {mode: 'cors'})
+                .then((response) => {
+                    // if (response.)
+                    // console.log(response); 
+                    return response.json() 
+                    })
+                .then(response => {
+        // let random = Math.floor(Math.random() * Object.keys(response.data.images).length); 
+        // console.log(random, response.data.images.preview.mp4); 
+                    console.log('response.json', response); 
+                    if (JSON.stringify(response.data) === '{}') {
+                        throw new Error('No images found.'); 
+                    }
+            img.src = response.data.images['original'].url;
+        }
+    )
+    .catch(err => {
+        img.src = `No images found. ${err}`; 
+        console.log(err); 
+        return; 
+    })}
+    }
+
+    async function asyncGetNewGif() {
+        if (input.value.length >= 3) {
+           let response = await fetch(`https://api.giphy.com/v1/gifs/translate?api_key=IGYD4m9MfpWjhMI52ZZa6JsoqjuDPE7J&s=${input.value}`, {mode: 'cors'});  
+        //    .catch(err => {
+        //        img.src = `No images found. ${err}`; 
+        //        console.log(err); 
+        //        return; 
+        //        })}
+        const gifResponse = await response.json(); 
+        if (JSON.stringify(gifResponse.data) === '{}') {
+             throw new Error('No images found.'); 
+             console.error('No gifs found for that search term.') 
+        }
+        img.src = gifResponse.data.images['original'].url;
+    }
+}
+
+input.addEventListener('input', (e) => {
+    console.log(input.value, input.value.length); 
+asyncGetNewGif(); 
+})
+  </script>
+</body>
+</html>

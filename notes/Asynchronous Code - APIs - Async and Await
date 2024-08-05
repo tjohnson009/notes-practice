@@ -338,4 +338,441 @@ The event loops job is to look at the stack and the task queue - if the stack is
 
 
 ## APIs ##
+One of the most powerful things a web developer can do is fetching data from a server and displaying it creatively on their site.
+Servers that are created for serving data for external use (in websites or apps) are often referred to as APIs or ‘Application Programming Interfaces’.
+ In most cases, you will have to create an account and request an “API key” (random and unique) from the API service before attempting to fetch data from their endpoints (specific URLs that you use to access a particular function or data within the API). 
+ Issuing API keys allows an API service to better track abuse of their systems and data. Additionally, it can also be a way for those services to mitigate and recuperate operating costs.
+ Because your API key is your key to these services and data, securing them is an important habit, especially if you are using a paid tier. ****** There are plenty of bots that crawl GitHub repositories solely for hardcoded/unsecured API keys, allowing bad agents to then access and utilize the services and data you’ve paid for. *****
 
+ This is how we used to request data from APIs: 
+ // Just getting XHR is a mess!
+if (window.XMLHttpRequest) { // Mozilla, Safari, ...
+  request = new XMLHttpRequest();
+} else if (window.ActiveXObject) { // IE
+  try {
+    request = new ActiveXObject('Msxml2.XMLHTTP');
+  }
+  catch (e) {
+    try {
+      request = new ActiveXObject('Microsoft.XMLHTTP');
+    }
+    catch (e) {}
+  }
+}
+// Open, send.
+request.open('GET', 'https://url.com/some/url', true);
+request.send(null);
+
+Developers got sick of having to write this all out so they developed easier ways. Some of the more popular libraries are axios and superagent, both of which have their strengths and weaknesses. Now we have another tool: meet FETCH. 
+
+// URL (required), options (optional)
+fetch('https://url.com/some/url')
+  .then(function(response) {
+    // Successful response :)
+  })
+  .catch(function(err) {
+    // Error :(
+  });
+
+- CORS: 
+  For security reasons, by default, browsers restrict HTTP requests to outside sources (which is exactly what we’re trying to do here). 
+
+  CORS stands for "cross origin resource sharing" - it is a security feature implemented by web browsers. 
+  It allows brosers to request resources from sources and domains outside of itself. By default web browsers enforce "same origin" resource policies to prevent malicious attacks. Before making the actual request, thhe browser sends an HTTP options request to the server to ensure it is a safe request. The server responds with specific headers like "Access-Control-Allow-Origin". 
+  Access-Control-Allow-Origin: Specifies which origin can access the resource.
+  Access-Control-Allow-Methods: Specifies the HTTP methods allowed (GET, POST, etc.).
+  Access-Control-Allow-Headers: Lists headers that can be used during the actual request.
+
+
+**** With fetch, you are able to easily supply a JavaScript object for options. It comes right after the URL as a second parameter to the fetch function:
+
+fetch('url.url.com/api', {
+  mode: 'cors'
+});
+
+Adding the {mode: 'cors'} after the URL, as shown above, will solve our problems for now. In the future, however, you may want to look further into the implications of this restriction.
+While we are pushing this API key to the frontend, this isn’t something you should do with any key that is not free. Keys used on the client-side are considered public knowledge, so caution must be taken with sensitive and non-free keys. 
+
+
+
+
+## FETCH API ##
+Fetch is the modern replacement for XMLHttpRequest: unlike XMLHttpRequest, which uses callbacks, Fetch is promise-based and is integrated with features of the modern web such as service workers and Cross-Origin Resource Sharing (CORS).
+.fetch is available as a global function in both thhe window and worker contexts. You pass it a Request object or a string containing the URL to fetch, along with an optional argument to configure the request.
+
+async function getData() {
+  const url = "https://example.org/products.json";
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Response status: ${response.status}`);
+    }
+
+    const json = await response.json();
+    console.log(json);
+  } catch (error) {
+    console.error(error.message);
+  }
+}
+
+Note that like .fetch() itself, .json() is asynchronous, as are all the other methods to access the response body content.
+
+const myHeaders = new Headers();
+myHeaders.append("Content-Type", "application/json");
+
+const response = await fetch("https://example.org/post", {
+  method: "POST",
+  body: JSON.stringify({ username: "example" }),
+  headers: myHeaders,
+});
+
+
+async function post(request) {
+  try {
+    const response = await fetch(request);
+    const result = await response.json();
+    console.log("Success:", result);
+  } catch (error) {
+    console.error("Error:", error);
+  }
+}
+const request1 = new Request("https://example.org/post", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({ username: "example1" }),
+});
+const request2 = new Request(request1, {
+  body: JSON.stringify({ username: "example2" }),
+});
+post(request1);
+post(request2);
+
+
+const controller = new AbortController();
+
+const fetchButton = document.querySelector("#fetch");
+fetchButton.addEventListener("click", async () => {
+  try {
+    console.log("Starting fetch");
+    const response = await fetch("https://example.org/get", {
+      signal: controller.signal,
+    });
+    console.log(`Response: ${response.status}`);
+  } catch (e) {
+    console.error(`Error: ${e}`);
+  }
+});
+
+const cancelButton = document.querySelector("#cancel");
+cancelButton.addEventListener("click", () => {
+  controller.abort();
+  console.log("Cancelled fetch");
+});
+
+
+## ASYNC AWAIT ##
+async and await are two keywords that can help make asynchronous read more like synchronous code. This can help code look cleaner while keeping the benefits of asynchronous code.
+Both functions do the same thing: 
+- function getPersonsInfo(name) {
+  return server.getPeople().then(people => {
+    return people.find(person => { return person.name === name });
+  });
+}
+- async function getPersonsInfo(name) {
+  const people = await server.getPeople();
+  const person = people.find(person => { return person.name === name });
+  return person;
+}
+
+Async functions always return a Promise. If the function throws an error, the Promise will be rejected. If the function returns a value, the Promise will be resolved.
+
+EXAMPLE: 
+- function doubleAfter2Seconds(x) {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve(x * 2);
+    }, 2000);
+  });
+}
+
+
+1. function addPromise(x){
+  return new Promise(resolve => {
+    doubleAfter2Seconds(10).then((a) => {
+      doubleAfter2Seconds(20).then((b) => {
+        doubleAfter2Seconds(30).then((c) => {
+          resolve(x + a + b + c);
+      	})
+      })
+    })
+  });
+}
+
+addPromise(10).then((sum) => {
+  console.log(sum);
+}); 
+
+TURNS INTO
+2. async function addAsync(x) {
+  const a = await doubleAfter2Seconds(10);
+  const b = await doubleAfter2Seconds(20);
+  const c = await doubleAfter2Seconds(30);
+  return x + a + b + c;
+}
+
+**The Async Keyword**
+When a function is declared with async, it automatically and ALWAYS returns a promise; returning in an async function is the same as resolving a promise. Other values are wrapped in a resolved promise automatically. Likewise, throwing an error will reject the promise. They are syntactical sugar for promises. It is valid to use an async function anywhere you can use a normal function. 
+- someArray.forEach(async item => {   <-- LOOK AT THIS EXAMPLE
+  // do something asynchronously for each item in 'anArray'
+  // one could also use .map here to return an array of promises to use with 'Promise.all()'
+});
+- server.getPeople().then(async people => {
+  people.forEach(person => {
+    // do something asynchronously for each person
+  });
+});
+
+- async function f() {
+  await Promise.reject(new Error("Whoops!"));
+}
+…is the same as this:
+async function f() {
+  throw new Error("Whoops!");
+}
+
+- async function f() {
+  try {
+    let response = await fetch('/no-user-here');
+    let user = await response.json();
+  } catch(err) {
+    // catches errors both in fetch and response.json
+    alert(err);
+  }
+}
+f();
+
+If we don’t have try..catch, then the promise generated by the call of the async function f() becomes rejected. We can append .catch to handle it:
+async function f() {
+  let response = await fetch('http://no-such-url');
+}
+// f() becomes a rejected promise
+f().catch(alert); // TypeError: failed to fetch // (*)
+
+- When we use async/await, we rarely need .then, because await handles the waiting for us. And we can use a regular try..catch instead of .catch. That’s usually (but not always) more convenient.
+
+**The Await Keyword**
+YOU MUST ALSO AWAIT for response.json() ***
+"why does response.json() return a promise?" then @Bergi provides the clue in comments: "it waits for the body to load".
+// works only inside async functions
+let value = await promise;
+
+await does the following: it tells JavaScript to wait for an asynchronous action to finish before continuing the function. It’s like a ‘pause until done’ keyword. It gets the value from a function where you would normally use .then(). Instead of calling .then() you assign a variable to the result using await, and then you can use the result;
+
+Await literally suspends the function execution until the promise settles, and then resumes it with the promise result. That doesn’t cost any CPU resources, because the JavaScript engine can do other jobs in the meantime: execute other scripts, handle events, etc. We cannot use await in regular functions. 
+
+async function showAvatar() {
+  // read our JSON
+  let response = await fetch('/article/promise-chaining/user.json');
+  let user = await response.json();
+  // read github user
+  let githubResponse = await fetch(`https://api.github.com/users/${user.name}`);
+  let githubUser = await githubResponse.json();
+  // show the avatar
+  let img = document.createElement('img');
+  img.src = githubUser.avatar_url;
+  img.className = "promise-avatar-example";
+  document.body.append(img);
+  // wait 3 seconds ***
+  await new Promise((resolve, reject) => setTimeout(resolve, 3000));
+  img.remove();
+  return githubUser;
+}
+showAvatar();
+
+- Modern browsers allow top-level await in modules: 
+// we assume this code runs at top level, inside a module
+let response = await fetch('/article/promise-chaining/user.json');
+let user = await response.json();
+console.log(user);
+If using older browsers, this works too:
+(async () => {
+  let response = await fetch('/article/promise-chaining/user.json');
+  let user = await response.json();
+  ...
+})();
+
+- await accepts “thenables”
+Like promise.then, await allows us to use thenable objects (those with a callable then method). The idea is that a third-party object may not be a promise, but promise-compatible: if it supports .then, that’s enough to use it with await.
+class Thenable {
+  constructor(num) {
+    this.num = num;
+  }
+  then(resolve, reject) {
+    alert(resolve); // anonymous function
+    // resolve with this.num*2 after 1000ms
+    setTimeout(() => resolve(this.num * 2), 1000); // (*)
+  }
+}
+async function f() {
+  // waits for 1 second, then result becomes 2
+  let result = await new Thenable(1);
+  alert(result); // 2
+}
+f();
+
+- Async class methods are supported
+class Waiter {
+  async wait() {
+    return await Promise.resolve(1);
+  }
+}
+new Waiter()
+  .wait()
+  .then(alert); // 1 (this is the same as (result => alert(result)))
+
+- async/await works well with Promise.all:
+// wait for the array of results
+let results = await Promise.all([
+  fetch(url1),
+  fetch(url2),
+  ...
+]);
+
+- Error Handling: 
+Just like promises, you append .catch() method method
+- asyncFunctionCall().catch(err => {
+  console.error(err)
+});
+- Try Catch Blocks:
+ If you want to handle the error directly inside the async function, you can use try/catch just like you would inside synchronous code. THESE ARE IMPORTANT because if we don't use try/catch blocks, our successful code will still run even if theres an error with only a .catch() block.
+ Ex: async function start2() {
+    const result = await getData()
+        .catch(error => {
+            console.log(error);
+        })
+        console.log(result) ===> UNDEFINED because we didn't use try/catch blocks and it introduces bugs into our code
+ }
+ async function getPersonsInfo(name) {
+  try {
+    const people = await server.getPeople();
+    const person = people.find(person => { return person.name === name });
+    return person;
+  } catch (error) {
+    // Handle the error any way you'd like
+  }
+}
+
+* It is important to remember async/await are just promises written in a different way. The async keyword before a function has two effects:
+1. Makes it always return a promise.
+2. Allows await to be used in it.
+The await keyword before a promise makes JavaScript wait until that promise settles, and then:
+
+If it’s an error, an exception is generated — same as if throw error were called at that very place.
+Otherwise, it returns the result.
+Together they provide a great framework to write asynchronous code that is easy to both read and write.
+
+With async/await we rarely need to write promise.then/catch, but we still shouldn’t forget that they are based on promises, because sometimes (e.g. in the outermost scope) we have to use these methods. Also Promise.all is nice when we are waiting for many tasks simultaneously.
+
+- Make this async await: cleared
+async function loadJson(url) {
+  let response = await fetch(url);  
+      if (response.status == 200) {
+        return response.json();
+      } else {
+        throw new Error(response.status);
+      }
+    }
+
+loadJson('https://javascript.info/no-such-user.json')
+  .catch(alert); // Error: 404
+Notes:
+The function loadJson becomes async.
+All .then inside are replaced with await.
+
+- Make this async await:
+class HttpError extends Error {
+  constructor(response) {
+    super(`${response.status} for ${response.url}`);
+    this.name = 'HttpError';
+    this.response = response;
+  }
+}
+
+async function loadJson(url) {
+  let response = await fetch(url)
+      if (response.status == 200) {
+        return response.json();
+      } else {
+        throw new HttpError(response);
+      }
+    }; 
+
+// Ask for a username until github returns a valid user
+async function demoGithubUser() {
+  let user; 
+    while (true) {
+        let name = prompt('enter a name', 'iliakan')
+    try {
+        user = await await loadJson(`https://api.github.com/users/${name}`);
+        break; 
+    } catch(err) {
+      if (err instanceof HttpError && err.response.status == 404) {
+        alert("No such user, please reenter.");
+      } else {
+        throw err;
+      }
+    };
+    }
+    }
+demoGithubUser();
+
+## CRUCIAL EXAMPLE:
+## Call async from non-async: ##
+We have a “regular” function called f. How can you call the async function wait() and use its result inside of f?
+async function wait() {
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  return 10;
+}
+function f() {
+  // ...what should you write here?
+  // we need to call async wait() and wait to get 10
+  // remember, we can't use "await"
+}
+P.S. The task is technically very simple, but the question is quite common for developers new to async/await.
+
+* solution:
+That’s the case when knowing how it works inside is helpful.
+Just treat async call as promise and attach .then to it:
+- async function wait() {
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  return 10;
+}
+
+## function f() {
+  ## // shows 10 after 1 second
+  ## wait().then(result => alert(result));
+ ## }
+
+f();
+
+
+function handleError(fn) {
+  return function (...params) {
+    return fn(...params).catch(function(err) {
+      console.log('oops', err);
+      // Optionally, rethrow the error if you want further handling
+      throw err;
+    });
+  };
+}
+
+The handleError function is designed to wrap a function that returns a promise, adding error handling through a .catch() block. The primary purpose is to provide a consistent way to log errors from asynchronous operations. 
+Explanation:
+Higher-Order Function: handleError takes a function fn as an argument and returns a new function that wraps fn to add error handling.
+Using Rest Parameters: The (...params) syntax allows the function to accept any number of arguments, gathering them into an array called params.
+Calling the Original Function: Inside the returned function, fn is called with (...params), which spreads the array into individual arguments. This function is expected to return a promise.
+Handling Promises with .catch():
+The .catch() method is attached to the promise returned by fn(...params).
+If an error occurs (i.e., the promise is rejected), the .catch() block logs the error with console.log('oops', err).
