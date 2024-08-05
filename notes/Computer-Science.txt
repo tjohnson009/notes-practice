@@ -1,0 +1,15 @@
+If you assume those lessons were all about learning how to write good code, these next few lessons are going to be about training yourself to figure out the best code to write – the most elegant solution to the problem at hand. It becomes particularly important whenever you start working with large data sets, like when your website becomes highly successful.
+
+# Algorithms:
+A set of instructions for solving some problem step by step. Algorithms are everywhhere. 
+Algorithms become important in web development when you have a lot of data that you have to process or when you are performing complicated transformations on that data. For example, consider the Quora search engine. You could probably develop a similar search engine without much algorithms experience. However, once your site gained thousands or millions of users, your search engine would not be able to handle the large bandwidth of requests. 
+Algorithms let you figure out efficient ways to handle large amounts of data.
+
+Pseudocode is an English way to state an algorithm. 
+
+# Recursion:
+Recursion is the idea that a function calls itself. It is used to take on bigger problems and break them down into smaller pieces. Think ## Divide and Conquer ##. 
+` In computer science, divide and conquer (D&C) is an important algorithm design paradigm based on multi-branched recursion. A divide and conquer algorithm works by recursively breaking down a problem into two or more sub-problems of the same (or related) type, until these become simple enough to be solved directly. The solutions to the sub-problems are then combined to give a solution to the original problem. `
+
+The fact is, any problem you can solve recursively, you can also solve using the iterators that you know and love. If you find yourself saying “why didn’t I just use a while loop here?” then you probably should have. Some problems also break down into far too many pieces and totally overwhelm your computer’s memory. There’s a balance.
+
