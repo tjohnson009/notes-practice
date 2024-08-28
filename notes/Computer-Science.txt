@@ -315,7 +315,7 @@ Here, the recursive call sumTailRecursive(n-1, accu + n) is the last operation, 
 
 
 # MERGE SORT #
- - the main idea is to sort smaller arrays and c ombine those arrays into the correct order
+ - the main idea is to sort smaller arrays and combine those arrays into the correct order
  - the most complicated type of sort in CS50
  - Sort the left, sort the right, merge the sorted halves together. 
  Merge Sort is just these 3 steps recursively. Dividing and Conquering
@@ -338,7 +338,7 @@ Here, the recursive call sumTailRecursive(n-1, accu + n) is the last operation, 
  0123456
  only 7 left? 01234567
 
- # QUICK NOTE #
+ # QUICK NOTE ON LOGARITHMS #
  Logarithms:
  b^p = n 
 
@@ -347,4 +347,7 @@ Here, the recursive call sumTailRecursive(n-1, accu + n) is the last operation, 
     `b
  log  8 = 3
     `2
+
+
+### TIME COMPLEXITY ###
 
