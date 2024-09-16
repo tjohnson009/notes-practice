@@ -134,8 +134,9 @@ alert(sumSalaries(company)); // 7700
 We can easily see the principle: for an object {...} subcalls are made, while arrays [...] are the “leaves” of the recursion tree, they give immediate result.
 
 ## Linked List:
-There’s a big problem with arrays... The “delete element” and “insert element” operations are expensive. For instance, arr.unshift(obj) operation has to renumber all elements to make room for a new obj, and if the array is big, it takes time. Same with arr.shift().
-If we really need fast insertion/deletion, we can choose another data structure called a linked list.
+There’s a big problem with arrays... The “delete element” and “insert element” operations are expensive. 
+For instance, arr.unshift(obj) operation has to renumber all elements to make room for a new obj, and if the array is big, it takes time. Same with arr.shift().
+If we really need fast insertion/deletion, we can choose another data structure called a LINKED LIST.
 
 ## The linked list element is recursively defined as an object with:
 - value.
@@ -154,6 +155,11 @@ let list = {
     }
   }
 };
+
+A linked list is a linear collection of data elements called nodes that “point” to the next node by means of a pointer.
+Each node holds a single element of data and a link or pointer to the next node in the list.
+A head node is the first node in the list, a tail node is the last node in the list. Below is a basic representation of a linked list:
+* [ NODE(head) ] -> [ NODE ] -> [ NODE(tail) ] -> null
 
 ## A recursively-defined data structure is a data structure that can be defined using itself.
 list = { value, next -> list }
@@ -338,9 +344,9 @@ Here, the recursive call sumTailRecursive(n-1, accu + n) is the last operation, 
  0123456
  only 7 left? 01234567
 
- # QUICK NOTE ON LOGARITHMS #
+# QUICK NOTE ON LOGARITHMS #
  Logarithms:
- b^p = n 
+bn = p
 
  p is the logarithm of n
  log  n = p  ==> b ^ p = n OR b raised to what power = n 
@@ -349,5 +355,183 @@ Here, the recursive call sumTailRecursive(n-1, accu + n) is the last operation, 
     `2
 
 
-### TIME COMPLEXITY ###
+# TIME COMPLEXITY #
+In programming, there are two ways we can measure the efficiency of our code. We can measure the time complexity or the space complexity. It’s important to understand that you never measure the efficiency of an algorithm by how long it takes to execute.
+
+The way to measure code efficiency is to evaluate how many ‘steps’ it takes to complete. A 5 step program will always run faster than a 20 step program. Steps are key. 
+
+function oddNumbersLessThanTen() {
+  let currentNumber = 1;
+  while (currentNumber < 10) {
+    if (currentNumber % 2 !== 0) {
+      console.log(currentNumber);
+    }
+    currentNumber += 1;
+  }
+}
+
+So there are 3 steps for every loop iteration and it iterates 9 times which is 27 steps. Then we have one step which iterates for only half the loop iteration which is 5 steps. Assigning an initial value to currentNumber and checking the exit condition of the loop is one step each. 27 + 5 + 1 + 1 = 34 steps. But for other functions and algorithms it depends on a lot of factors to get to the final answer of number of steps. 
+
+- Asymptotic Notations:
+Asymptotic Notations are used to describe the running time of an algorithm. Because an algorithm’s running time can differ depending on the input, there are several notations that measure that running time in different ways. The 3 most common are as follows:
+
+-- Big O Notation * - represents the upper bound of an algorithm. This means the worst-case scenario for how the algorithm will perform. Big O is most common because as applications scale, you need to be sure of the worse case scaenario. Big O only wants to tell us an algorithm’s complexity relative to the size of the input.
+The Big O Notations in the order of speed from fastest to slowest are:
+
+- O(1) - Constant Complexity: array[2] - no matter how big an array gets, accessing an element is constant 1 step - this is as good as it gets for time complexity; 
+You may have thought a moment ago, is it really just one step? The answer is technically no, in reality the computer must first look up where the array is in memory, then from the first element in the array it needs to jump to the index argument provided. That’s at least a couple of steps. So you wouldn’t be wrong for writing something like O(1 + 2(steps)). However, the 2 steps are merely incidental. With an array of 10,000 elements, it still takes the same amount of steps as if the array was 2 elements. Because of this, Big O doesn’t concern itself with these incidental numbers. They don’t provide any context to how the complexity grows when the data size changes, because they are constant, and so in Big O they are dropped.
+- O(log N) - Logarithmic Complexity: the numbers of steps an algorithm takes increases by 1 as the data doubles; This is still pretty efficient (going from 5000 elements to 10000 elements only adds one step); BINARY SEARCH is here
+- O(N) - Linear Complexity: as the number of items grows, the number of steps grows at exactly the same rate. This happens whenever you iterate over an array, therefore as the number of elements grows, your steps grow. 
+- O(N log N) - N x log N Complexity: This is like splitting a big problem into smaller problems and then doing work on each smaller part; MERGE SORT
+- O(n²) - Quadratic Complexity: double nested loops; 
+- O(n³) - Cubic Complexity: triple nested loops; 
+- O(2ⁿ) - Exponential Complexity: with each item added to the data size, the number of steps doubles from the previous number of steps - you want to avoid this as much as possible because it is very slow - Fibonacci is an example
+- O(N!) - Factorial Complexity: if you ever need to calculate permutations or combinations - The factorial of 3 is 6 (3 * 2 * 1). The factorial of 4 is 24. The factorial of 10? 3,628,800. Things get out of hand quickly, avoid at all costs
+
+-- Omega Notation - represents the lower bound of an algorithm. This is the best-case scenario.
+Omega Notation isn’t considered as useful because it is unlikely our item will often be the first item in our data structure search, so it doesn’t give us any idea how well the algorithm will scale.
+
+-- Theta Notation - represents both the upper bound and lower bound and therefore analyses the average case complexity of an algorithm. It looks to give the EXACT value or a useful range between narrow upper and lower bounds. 
+
+# SPACE COMPLEXITY #
+When we talk about memory, we mean primary memory, which is the working memory available to your system to execute algorithms. Primary memory is a segment of computer memory that can be accessed directly by the processor and is the part of the computer that stores current data, programs, and instructions. . In a hierarchy of memory, primary memory has access time less than secondary memory and greater than cache memory. 
+
+Anyways:
+Space complexity can be considered to be the total space used by an algorithm relative to the size of the input. Measuring space complexity considers the space used by your algorithm input and auxiliary space. Auxiliary space is the extra space used by the algorithm. It is the total amount of working memory our algorithm needs.
+
+The first thing to know is that, like time complexity, we measure space complexity by considering all steps including any constants, and then we drop the constants when applying a Big O Notation to the algorithm.
+Most data structures you come across will have a space complexity of O(N). That makes sense - when you increase the number of items in your data structure, it increases the space that data structure occupies in a linear way.
+
+Space complexity is a measure of the amount of working storage an algorithm needs. That means how much memory, in the worst case, is needed at any point in the algorithm. As with time complexity, we're mostly concerned with how the space needs grow, in big-Oh terms, as the size N of the input problem grows.
+
+-- Memoization - It's like the program is taking notes on problems it has already solved. When the program needs to solve the same problem again, it checks its "notes" first. If the answer is there, it uses that instead of recalculating everything from scratch.
+This is super useful for problems that:
+- Take a long time to solve
+- Get asked over and over again
+
+Constant time and space complexity is as good as an algorithm can get, but it’s not always possible.
+
+There is usually a trade-off between space complexity and time complexity: to increase the speed of an algorithm, you’ll likely need to store more variables in memory.
+
+ // TIMER TRICK
+const t0 = performance.now()
+// Add function here...
+const t1 = performance.now()
+console.log("The function took: " + (t1 - t0) + " milliseconds.")
+
+
+# DATA STRUCTURES #
+The basic idea of a data structure is to store data in a way that meets the needs of your particular application. Searching algorithms are paramount for large data sets. Two to look at: breadth-first-search and depth-first-search. 
+In computer science, a **data structure** is a way to organize and store data so that it can be accessed and used efficiently. Think of it like a special box where you keep your things organized, making it easy to find what you need.
+
+### Key Points:
+1. **What is a Data Structure?**  
+   - It's a collection of data values, how they relate to each other, and the operations you can perform on them.
+2. **Why Use Data Structures?**  
+   - Different types of data structures are better for different tasks. For example, some help you find information quickly, while others make it easy to add or remove items.
+3. **Common Types of Data Structures:**
+   - **Arrays:** A list of items in a specific order. You can think of it like a row of lockers, where each locker has a number.
+   - **Linked Lists:** A series of connected items where each item points to the next one. It’s like a chain of paperclips.
+   - **Hash Tables:** A way to store data that allows for quick lookups, like a dictionary where you can find a word really fast.
+   - **Graphs:** A collection of points (called nodes) connected by lines (called edges), used to show relationships, like a map of friends on social media.
+   - **Stacks and Queues:** Special ways to organize items where you can only add or remove from one end (stack) or from both ends (queue).
+   - **Trees:** A structure that organizes data in a hierarchy, like a family tree.
+4. **How Are They Used?**  
+   - Data structures help manage large amounts of information efficiently, like in databases or when searching the internet.
+5. **Programming Languages:**  
+   - Many programming languages have built-in support for data structures, making it easier for programmers to use them in their code.
+In summary, data structures are essential tools in computer science that help organize and manage data effectively, making it easier to perform various tasks with that data.
+
+## ALGORITHMS: Searching Through a Phonebook For A Name
+
+- Linear Search Algorithm: searching names one by one by last name - "Aaron? no. Abel? no. Abraham? no. etc"; Tens of thhousands of comparisons until you find the right name. The process of going start to finish through a list and comparing values. This is brute force. 
+- Chunking Search Algorithm: The process of chunking involves first finding the general area where an entry would be, then proceeding to check every entry. This way is suboptimal.
+- Binary Search Algorithm: split the phonebook is half and determine whifh half the entry you're looking for is on, then throw away the other half. Repeat until the entry is found. Divide and conquer; THE DATA MUST BE SORTED FOR THIS TO WORK
+log2(400) = 8.64385618977, which means that in the worst cas e rounding up, it would take 9 comparisons.
+What about 4,000,000 pages? log2(4,000,000) = 21.9315685693, which means it would take at most 22 comparisons.
+
+In order to to use BFS or DFS you have to understand and implement certain concepts first. Without them, it's like trying to fix something without the proper tools. 
+## Queues
+You can find a great example of a queue simply by thinking about a typical experience at a deli. When you get in line, you pull a number and wait for your number to be called. Everyone who pulled a number before you will be given service before you, but when you’re the customer who has been in line the longest, your number will be called next. Queues are FIFO - First In, First Out
+Queues have 2 properties:
+- Enqueue is when you “start waiting.” It’s the equivalent of pulling a number in the deli example.
+- Dequeue is when it’s your turn to be served. It’s the equivalent of having your number called at the deli.
+
+It's NECESSARY to have 2 different pointers in the queue that point to the front of the queue and the back of the queue. The queue is "full" when the 'back' pointer is is directly to the left of the 'front' pointer. We can cycle our pointers throughout opur structure by using the modulo operator. So our back pointer can technically be in front of our front pointer. 
+Next Pointer position = (pointer + 1) % length of queue/array
+Example:
+A queue of length of 5. We move the end pointer to the back and then there are no more spaces. 
+next pointer position = ([4] + 1) % 5 ==> 5 % 5 ==> 0 so the next position for the pointer is position 0
+
+## Stacks
+This is like a stack of books. If you want to add something to thhe stack, it goes on top of the stack. You can only add to the top or remove from the top. Stacks are LIFO - last in, first out. Sorted by insertion order, elements are not indexed. Middle items cannot be accessed directly in stacks of queues
+
+# BINARY SEARCH TREES:
+Binary search trees (BSTs) are a special type of tree data structure where each node has at most two children, referred to as the left and right child. In a BST, for any given node, all elements in its left subtree are smaller than the node, and all elements in its right subtree are larger. This property makes BSTs efficient for searching, inserting, and deleting elements, typically with an average time complexity of O(log n) for these operations.
+
+To construct a BST from an array, you start with an empty tree and insert each element of the array one by one. For each insertion, you compare the new element with the root. If it's smaller, you move to the left child; if larger, you move to the right child. You continue this process until you find an empty spot to insert the new node. Traversing a BST can be done in several ways: in-order (left subtree, root, right subtree), pre-order (root, left subtree, right subtree), or post-order (left subtree, right subtree, root). In-order traversal of a BST yields the elements in sorted order, which is a useful property for many applications. 
+
+## BINARY TREE TRAVERSAL
+Whhen working with trees, we usuaully want to visit each of the nodes in the tree. Tree traversal is the process of visiting each node exactly one time in some order. Visiting the nodes involves reading/processing thhe data in the node. Binary search trees are composed of nodes. Each node has up to two direct children. In whhat order should we visit the nodes? We can either go breadth first or depth first. 
+Breadth first - visit all the nodes on the same level before continuing on to other levels. The root is level 0. This is also called to level order traversal - we traverse level by level. Here we visit all the child nodes before the grandchildren. 
+Depth first - visit all the child and grandchild nodes before going to the next child and grandchild set. AKA visit the left node and then all the children and grandchildren of the left node, then go on to the right node. There can be differences in how we visit the left subtree and thhe right subtree:
+Left, Root, Right OR Right, Root, Left OR ...
+3 popular strategies:
+Preorder - Root, Left, Right - with the left and right subtrees visited recursevily - DLR
+InOrder - Left, Root, Right - "" - LDR
+PostOrder - Left, Right, Root - "" - LRD
+The names are based on the position of the root. Root = Data AKA D, Left = L, Right = R;
+Once a subtree is done being traversed we can read the data. So for example, for InOrder traversal we go all the way down to the left most node, then once the left traversal is done, we can read the data. We always start at the root and then follow the order until we cannot go further.
+
+By convention, the left subtree is always visited before the right subtree
+### BREADTH FIRST TRAVERSAL
+This is also referred to as level order traversal. We start at the root AKA level 0 and then onto level 1, and then level 2 and so on. However, theres a slight problem - we cannot only use one pointer or variable to keep track of where we should go next because in binary search trees each node is connected to up to 2 nodes and there may not be a way to get to that node directly if they sre not connected. We cannot even go back to the root node because there is no backward link to get back to the root node. How can we traverse the nodes in Breadth First Order?
+As we visit a node, we can keep a reference of all of its children in a QUEUE so that we can visit them later. A node that is in the queue can be called a discovered node because we know it's location but we have not visited it yet. Basicall;yy the algorithm is as follows:
+- Visit the first node
+- Enqueue is two children
+- Take out the next node from the queue
+- Visit that node
+- Enqueue its children
+- Etc. 
+
+Queues are FIFO so the order will be preserved. 
+The Time Complexity - O(n)
+The Space Complexity - O(n) is the worst case and the average case
+### DEPTH FIRST TRAVERSAL - PreOrder, InOrder, PostOrder
+If we go in any direction in DFS, we visit the complete subtree in that direction. The subtrees are visited in the same order
+as all the nodes in the original  subtree. How do we writw this functionally?
+Node are like objects that have 3 properties: data, address/location of the left node, address/location of the right node
+PreOrder:
+BASE CASE: if the root is null, return
+- Read data in the root node
+- Make recursive call to the left subtree
+- Make recursive call to the right subtree
+InOrder: inorder traversal of a binary search tree gives us the nodes in sorted order
+BASE CASE: if the root is null, return
+- Make Recursive call to the left subtree
+- Read the data in the root node
+- Make recursive call to the right subtree
+PostOrder:
+BASE CASE: if the root is null, return
+- Make Recursive call to the left subtree
+- Make recursive call to the right subtree
+- Read the data in the root node
+Time Complexity: O(n)
+Space Complexity: O(n) is worst case; O(log n) is the best case
+
+# WHICH SHOULD I USE?##
+If you know a solution is not far from the root of the tree, a breadth first search (BFS) might be better.
+If the tree is very deep and solutions are rare, depth first search (DFS) might take an extremely long time, but BFS could be faster.
+If the tree is very wide, a BFS might need too much memory, so it might be completely impractical.
+If solutions are frequent but located deep in the tree, BFS could be impractical.
+If the search tree is very deep you will need to restrict the search depth for depth first search (DFS), anyway (for example with iterative deepening). But these are just rules of thumb; you'll probably need to experiment. I think in practice you'll usually not use these algorithms in their pure form anyway. There could be heuristics that help to explore promising parts of the search space first, or you might want to modify your search algorithm to be able to parallelize it efficiently.
+
+Breadth First Search is generally the best approach when the depth of the tree can vary, and you only need to search part of the tree for a solution. For example, finding the shortest path from a starting value to a final value is a good place to use BFS.
+
+Depth First Search is commonly used when you need to search the entire tree. It's easier to implement (using recursion) than BFS, and requires less state: While BFS requires you store the entire 'frontier', DFS only requires you store the list of parent nodes of the current element.
+
+
+
+
+
 
