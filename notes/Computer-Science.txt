@@ -197,6 +197,9 @@ list.next = list.next.next;
 We made list.next jump over 1 to value 2. The value 1 is now excluded from the chain. If it’s not stored anywhere else, it will be automatically removed from the memory. Unlike arrays, there’s no mass-renumbering, we can easily rearrange elements.
 * The main drawback is that we can’t easily access an element by its number. In an array that’s easy: arr[n] is a direct reference. But in the list we need to start from the first item and go next N times to get the Nth element.
 
+Singly linked lists - only flow from the head node to the tail
+Doubly linked lists - can go forward or backward bec ause each node holds a reference to the next and previous node
+
 ## Lists can be enhanced:
 - We can add property prev in addition to next to reference the previous element, to move back easily.
 - We can also add a variable named tail referencing the last element of the list (and update it when adding/removing elements from the end).
@@ -229,7 +232,6 @@ printList(list) {
 }
 
 reverse a linked list
-
 
 let list = {
   value: 1,
@@ -519,7 +521,7 @@ BASE CASE: if the root is null, return
 Time Complexity: O(n)
 Space Complexity: O(n) is worst case; O(log n) is the best case
 
-# WHICH SHOULD I USE?##
+### WHICH SHOULD I USE?###
 If you know a solution is not far from the root of the tree, a breadth first search (BFS) might be better.
 If the tree is very deep and solutions are rare, depth first search (DFS) might take an extremely long time, but BFS could be faster.
 If the tree is very wide, a BFS might need too much memory, so it might be completely impractical.
@@ -530,6 +532,67 @@ Breadth First Search is generally the best approach when the depth of the tree c
 
 Depth First Search is commonly used when you need to search the entire tree. It's easier to implement (using recursion) than BFS, and requires less state: While BFS requires you store the entire 'frontier', DFS only requires you store the list of parent nodes of the current element.
 
+# HASH MAPS / HASH TABLE - DATA STRUCTURES #
+- One of the most commonly used data structures
+- A hash map takes in a key value pair, produces a hash code, and stores the pair in a bucket.
+
+## What is a hash code? What is hashing? ##
+Hashing involves taking an input in and generating a corresponding output. A hash function should be a pure function. 
+Hashing the same input should ALWAYS return the same hash code, and there should be no random generation component.
+
+function hash(name) { // basic but good nonetheless
+  return name.charAt(0);
+}
+
+There is a key difference between hashing and ciphering (encryption): reversibility. Hashing is a one-way process. 
+If you have a name "Carlos", we can hash it to "C". But it’s impossible to reverse it from "C" back to its original form. You cannot know if it’s "Carlos", maybe it’s "Carla" or "Carrot". We don’t know.
+
+* Hashing is very good for security. Given a password, you can save the hash of that password rather than the password’s plain text. If someone steals your hashes, they cannot know the original passwords since they are unable to reverse the hash back to the password.
+
+function stringToNumber(string) {
+  let hashCode = 0;
+  for (let i = 0; i < string.length; i++) {
+    hashCode += string.charCodeAt(i);
+  }
+  return hashCode;
+}
+
+function hash(name, surname) {
+  return stringToNumber(name) + stringToNumber(surname);
+}
+
+* Hash codes need to be numbers. Those numbers will serve as the indexes to the buckets we will keep our key value pair in. 
+
+## BUCKETS ##
+- Essentially arrays that we store our elements in
+The hash function returns a number that serves as the index of the array at which we store this specific key value pair. Let’s say we wanted to store a person’s full name as a key “Fred” with a value of “Smith”:
+- Pass “Fred” into the hash function to get the hash code which is 385.
+- Find the bucket at index 385.
+- Store the key value pair in that bucket. In this case, the key would be “Fred” and the value would be “Smith”.
+What if the bucket at index 385 already contains an item with the same key “Fred”? We check if it’s the same item by comparing the keys, then we overwrite the value with our new value. 
+
+Now if we wanted to get a value using a key:
+- To retrieve the value, we hash the key and calculate its bucket number.
+- If the bucket is not empty, then we go to that bucket.
+- Now we compare if the node’s key is the same key that was used for the retrieval.
+- If it is, then we can return the node’s value. Otherwise, we return null.
+Maybe you are wondering, WHY are we comparing the keys if we already found the index of that bucket? Remember, A HASH CODE IS JUST A LOCATION. Different keys might generate the same hash code!! We need to make sure the key is the same by comparing both keys that are inside the bucket.
+* Insertion order is not maintained: Example: if we insert the values Mao, Zach, Xari in this order, we may get back ["Zach", "Mao", "Xari"] when we call an iterator. If iterating over a hash map frequently is your goal, then this data structure is not the right choice for the job, a simple array would be better.
+
+## COLLISIONS ##
+A collision occurs when two different keys generate the exact same hash code. "Sara" and "raSa" will hash to the same location unless we change our hash function. 
+function stringToNumber(string) {
+  let hashCode = 0;
+
+  const primeNumber = 31;
+  for (let i = 0; i < string.length; i++) {
+    hashCode = primeNumber * hashCode + string.charCodeAt(i);
+  }
+  return hashCode;
+}
+Now because we are multiply the old hashcode with a prime number we will have different locations for each letter and therefore each name. NOTICE the usage of a prime number. We could have chosen any number we wanted, but prime numbers are preferable. Multiplying by a prime number will reduce the likelihood of hash codes being evenly divisible by the bucket length, which helps minimize the occurrence of collisions. We have a FINITE NUMBER OF BUCKETS so we cannot eliminate all colissions, but we can reduce the number of them. 
+
+What if each Node inside the bucket can store more than one value? Enter Linked Lists.Now each bucket would be a linked list. When inserting into a bucket, if it’s empty, we insert the head of Linked List. If a head exists in a bucket, we follow that Linked List to add to the end of it.
 
 
 
