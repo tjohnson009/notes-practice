@@ -535,6 +535,7 @@ Depth First Search is commonly used when you need to search the entire tree. It'
 # HASH MAPS / HASH TABLE - DATA STRUCTURES #
 - One of the most commonly used data structures
 - A hash map takes in a key value pair, produces a hash code, and stores the pair in a bucket.
+- Most languages have their own hashing function built in
 
 ## What is a hash code? What is hashing? ##
 Hashing involves taking an input in and generating a corresponding output. A hash function should be a pure function. 
@@ -562,6 +563,13 @@ function hash(name, surname) {
 }
 
 * Hash codes need to be numbers. Those numbers will serve as the indexes to the buckets we will keep our key value pair in. 
+* Rules for choosing good hash function:
+1. The hash function should be simple to compute.
+2. Number of collisions should be less while placing the record in the hash table.Ideally no collision should occur. Such a function is called perfect hash function.
+3. Hash function should produce such keys which will get distributed uniformly over an array.
+4. The hash function should depend on every bit of the key. Thus the hash function that simply extracts the portion of a key is not suitable.
+
+TWO METHODS: hashing by division and hashing by multiplication
 
 ## BUCKETS ##
 - Essentially arrays that we store our elements in
@@ -592,7 +600,61 @@ function stringToNumber(string) {
 }
 Now because we are multiply the old hashcode with a prime number we will have different locations for each letter and therefore each name. NOTICE the usage of a prime number. We could have chosen any number we wanted, but prime numbers are preferable. Multiplying by a prime number will reduce the likelihood of hash codes being evenly divisible by the bucket length, which helps minimize the occurrence of collisions. We have a FINITE NUMBER OF BUCKETS so we cannot eliminate all colissions, but we can reduce the number of them. 
 
-What if each Node inside the bucket can store more than one value? Enter Linked Lists.Now each bucket would be a linked list. When inserting into a bucket, if it’s empty, we insert the head of Linked List. If a head exists in a bucket, we follow that Linked List to add to the end of it.
+What if each Node inside the bucket can store more than one value? Enter Linked Lists.Now each bucket would be a linked list. When inserting into a bucket, if it’s empty, we insert the head of Linked List. If a head exists in a bucket, we follow that Linked List to add to the end of it. 
+
+## HASH TABLE GROWTH ## 
+We don't have infinite buckets. Most programming languages start with the default size of 16 buckets because it’s a power of 2, which helps with some techniques for performance that require bit manipulation for indexes. 
+How are we going to insert into those buckets when our hash function generates big numbers like 20353924? We make use of the modulo % operation. 
+* Given any number modulo by 16 we will get a number between 0 and 15. For example: "Manon" --> 1091 --> 1091 % 16 --> 3 (bucket #3)
+
+Eventually, however, there will be more nodes than there are buckets, which guarantees a collision. To grow our buckets, we create a new buckets list that is double the size of the old buckets list, then we copy all nodes over to the new buckets. Therefore we need to keep track of how two numbers: CAPACITY and the LOAD FACTOR. 
+ - The capacity is the total number of buckets we currently have.
+ - The load factor is a number that we assign our hash map to at the start. It’s the factor that will determine when it is a good time to grow our buckets. Hash map implementations across various languages use a load factor between 0.75 and 1.
+The product of these numbers is the threshold lets us know when it is time to grow our buckets. 
+
+\\ A hash map has an average case complexity of O(1) for the following methods:
+Insertion
+Retrieval
+Removal
+O(n) is the worst case scenario. 
+
+EXAMPLE
+class HashMap {
+  // ...
+  findBucket(key) { // uses murmer3 on the key to find a bucket to use
+    let h = murmur3(key);
+    return this.bs[h % this.bs.length]; // bs = buckets
+  }
+
+judgeEntry(bucket, key) { // determines if a given bucket has an entry with a given key
+    for (let e of bucket) {
+      if (e.key === key) {
+        return e;
+      }
+    }
+    return null;
+  }
+
+    set(key, value) { // If an entry is found, its value is overwritten. If no entry is found, the key-value pair is added to the map.
+    let b = this.findBucket(key); // chooses a bucket to use
+    let e = this.judgeEntry(b, key); // determines in the key is already in the bucket
+    if (e) { 
+      e.value = value; // if value is there, overwrite
+      return;
+    }
+    b.push({ key, value }); // if no value in the bucket
+  }
+
+    get(key) { // gets the value from the hashmap
+    let b = this.findBucket(key);
+    let e = this.judgeEntry(b, key);
+    if (e) {
+      return e.value;
+    }
+    return null;
+  }
+}
+
 
 
 
