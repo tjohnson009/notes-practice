@@ -536,6 +536,9 @@ Depth First Search is commonly used when you need to search the entire tree. It'
 - One of the most commonly used data structures
 - A hash map takes in a key value pair, produces a hash code, and stores the pair in a bucket.
 - Most languages have their own hashing function built in
+- Combining an array with a linked list
+- Best for non sorted data
+- Two parts: hash code and array; Run the data through the hash function and then store the data in the element of the array represented by the hash code
 
 ## What is a hash code? What is hashing? ##
 Hashing involves taking an input in and generating a corresponding output. A hash function should be a pure function. 
@@ -600,7 +603,9 @@ function stringToNumber(string) {
 }
 Now because we are multiply the old hashcode with a prime number we will have different locations for each letter and therefore each name. NOTICE the usage of a prime number. We could have chosen any number we wanted, but prime numbers are preferable. Multiplying by a prime number will reduce the likelihood of hash codes being evenly divisible by the bucket length, which helps minimize the occurrence of collisions. We have a FINITE NUMBER OF BUCKETS so we cannot eliminate all colissions, but we can reduce the number of them. 
 
-What if each Node inside the bucket can store more than one value? Enter Linked Lists.Now each bucket would be a linked list. When inserting into a bucket, if it’s empty, we insert the head of Linked List. If a head exists in a bucket, we follow that Linked List to add to the end of it. 
+What if each Node inside the bucket can store more than one value? Enter Linked Lists. Now each bucket would be a linked list. When inserting into a bucket, if it’s empty, we insert the head of Linked List. If a head exists in a bucket, we follow that Linked List to add to the end of it. 
+
+Hash tables / hash maps are arrays with linked lists inside of them. 
 
 ## HASH TABLE GROWTH ## 
 We don't have infinite buckets. Most programming languages start with the default size of 16 buckets because it’s a power of 2, which helps with some techniques for performance that require bit manipulation for indexes. 

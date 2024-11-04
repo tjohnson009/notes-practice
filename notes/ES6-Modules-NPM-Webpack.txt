@@ -1,3 +1,5 @@
+
+
 A JavaScript module bundler is a tool that gets around the problem with a build step (which has 
 access to the file system) to create a final output that is browser compatible (which doesn’t 
 need access to the file system).
@@ -8,8 +10,12 @@ but not when we push them to production
 
 _______________________________________________________________________
 ## NPM ##
+Is "npm" an acronym for "Node Package Manager"?
+Contrary to popular belief, npm is not in fact an acronym for "Node Package Manager"; It is a recursive bacronymic abbreviation for "npm is not an acronym" (if the project was named "ninaa", then it would be an acronym). The precursor to npm was actually a bash utility named "pm", which was the shortform name of "pkgmakeinst" - a bash function that installed various things on various platforms. If npm were to ever have been considered an acronym, it would be as "node pm" or, potentially "new pm".
+
 The node package manager is a command-line tool that gives you access to a gigantic repository of plugins, 
-libraries and tools. 
+libraries and tools. npm revolves around a file called package.json. It’s a JSON file containing information about our project, such as its name or any dependencies and their version numbers. npm can read this file and do things such as install all of the listed dependencies with the correct versions, and running commands that you’ve set as an npm script (we will cover npm scripts in a later lesson).
+
 Unscoped packages are always public, which means they can be searched for, downloaded, and installed by 
 anyone. To install a public package, on the command line, run: npm install <package_name>
 This will create the node_modules directory in your current directory (if one doesn't exist yet) and will 
@@ -37,17 +43,27 @@ export { functionOne };
 import { functionOne } from './functionOne';
 functionOne(); // this should work as expected! 
 
+*** Named imports/exports aren’t the same as object literals! ***
+Using { } with named imports/exports is special syntax and is not related in any way to declaring object literals or destructuring objects.
+
+export { greeting, farewell };
+
+import { greeting, farewell } from "./one.js";
+In the above, we are not exporting an object containing greeting and farewell keys, nor are we destructuring an object with those keys when importing. We are just using named import/export syntax.
+
+
+
 There are many benefits to writing your code in modules. One of the most compelling is code reuse.
 The "module pattern" and ES6 modules are not the same things. With the introduction of ES6 Modules, the module pattern (IIFEs) is NOT needed anymore, 
 though you might still encounter them in the wild. When using ES6 modules, only what is exported can be accessed in other modules by importing. Additionally, 
 any declarations made in a module are not automatically added to the global scope. ENCAPSULATION; You can still export constructors, classes and function factories
 
-There are TWO different ways to use exports in your code: named exports and default exports. You can have MULTIPLE named exports per module but only ONE default export. 
+There are TWO different ways to use exports in your code: named exports and default exports. You can have MULTIPLE named exports per module but *** only ONE default export. ***
 Which option you use depends on what you’re exporting. 
 
 After the export keyword, you can use let, const, and var declarations, as well as function or class declarations. You can also use the export { name1, name2 } syntax 
 to export a list of names declared elsewhere. Note that export {} does not export an empty object — it's a no-op declaration that exports nothing (an empty name list).
-Named exports: 
+- Named exports: 
 // a file called myModule.js
 const functionOne = () => 'ONE';
 const functionTwo = () => 'TWO';
@@ -76,11 +92,9 @@ The "export from" syntax is essentially a shorthand for the following two-step p
 Import the desired exports from the other module using the regular import statement.
 Re-export those imports using the regular export statement.
 So, the statement:
-javascript
 export { default as function1, function2 } from "bar.js";
 
 is equivalent to:
-javascript
 import { default as function1, function2 } from "bar.js";
 export { function1, function2 };
 
@@ -158,6 +172,12 @@ What if we had a way to write multiple files and/or import multiple third-party 
 combine them all into fewer files at the end so the browser did not have to make so many requests?  BUNDLERS
 Give a bundler a starting file (an entry point) and it will build a dependency graph of the modules and 
 dependencies starting from that file, then combine them into a single output file that is production-ready loadable in the browser.
+
+<script src="two.js" type="module"></script>
+importer  depends on  exporter
+two.js <-------------- one.js
+When we load two.js as a module, the browser will see that it depends on one.js and load the code from that file as well. If we instead used one.js as our entry point, the browser would see that it does not depend on any other files, and so would do nothing else. Our code from two.js would not be used, and nothing would get logged!
+
 
 A JavaScript bundler can be used when your project becomes too large for a single file or when you're 
 working with libraries that have multiple dependencies.
