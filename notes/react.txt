@@ -1,0 +1,151 @@
+# Setting Up A React Environment #
+There are many ways to start using React in your projects:
+Some examples of these toolchains include:
+- Vite’s React Config
+- Gatsby
+- NextJS
+- Create React App (Deprecated): Create React App, or CRA, was the official way to scaffold new React projects since its introduction in 2016. Unfortunately, owing to many reasons, CRA was deprecated in early 2023. Due to CRA’s popularity, you’ll see it mentioned in many tutorials and guides. However, it’s no longer recommended to use it for new projects.
+NOW we can start up react with a single terminal command
+* VITE builds frontend tools for developers and it leverages the latest technologies under the hood to provide a great developer experience. Fortunately, it also caters to the React ecosystem. We will use Vite’s CLI to quickly create a template React project. 
+
+*** npm create vite@latest my-react-app -- --template react ***
+THEN: 
+cd my-first-react-app
+npm install
+npm run dev 
+
+If creating a react project in a existing repo:
+*** npm create vite@latest . -- --template react ***
+This will tell Vite to use the current directory for the project, instead of creating a new directory 
+with the given project name. This cloned directory will already be initialized as a git repo and connected to the right remote.
+
+# REACT COMPONENTS #
+The beauty of React is that it allows you to break a UI (User Interface) down into independent reusable chunks, which we will refer to as components. Think of these reusable chunks as JavaScript functions which can take some kind of input and return a React element.
+
+function Greeting() {
+  return <h1>&quot;I swear by my pretty floral bonnet, I will end you.&quot;</h1>;
+}
+React components return JSX. 
+* React components MUST be capitalized or they will not function as expected, which is why we capitalized Greeting().
+*** For a very long time in React development, it was necessary to import React in your JavaScript files that used React components, but since React v17.0 it is no longer required. ***
+
+# What is JSX? #
+JSX is a syntax extension for JavaScript that lets you write HTML-like markup inside a JavaScript file. It’s NOT required to use JSX when writing React components, but it does make writing them more concise.
+JSX is syntactic sugar for the React createElement function. JSX compiles down to plain JavaScript objects.
+- Rules of JSX:
+1. Return a sinlge root elementfunction App() {
+  // Could replace <></> with <div></div>
+  return (
+    <> // this is called a React Fragment - single element
+    Fragments let you group things without leaving any trace in the browser HTML tree.
+      <h1>Example h1</h1>
+      <h2>Example h2</h2>
+    </>
+  );
+}
+2. Close all tags
+function App() {
+  return (
+    <>
+      <input />
+      <li></li>
+    </>
+  );
+ }
+3. camelCase most tags: JSX turns into JavaScript, and 
+* attributes of elements become keys of JavaScript objects, *
+so you can’t use dashes or reserved words such as class. Because of this, many HTML attributes are written in camelCase. Instead of stroke-width, you’d use strokeWidth, and instead of class you’d use className.
+
+# JavaScript with Markup #
+You can use curly braces in your JSX to open a window to JavaScript. That’s because curly braces let you work with JavaScript right there in your markup!
+JSX is a special way of writing JavaScript. That means it’s possible to use JavaScript inside it—with curly braces { }. 
+You can only use curly braces in two ways inside JSX:
+1. As text directly inside a JSX tag: <h1>{name}'s To Do List</h1> works, but <{tag}>Gregorio Y. Zara's To Do List</{tag}> will not.
+2. As attributes immediately following the = sign: src={avatar} will read the avatar variable, but src="{avatar}" will pass the string "{avatar}".
+
+You can pass a JS object in JSX, but you must wrap the object in another pair of curly braces: 
+person={{ name: "Hedy Lamarr", inventions: 5 }}.
+You may see this with inline CSS styles in JSX. React does not require you to use inline styles (CSS classes work great for most cases). 
+But when you need an inline style, you pass an object to the style attribute:
+export default function TodoList() {
+  return (
+    <ul style={{ <--- SEE
+      backgroundColor: 'black',
+      color: 'pink'
+    }}>
+      <li>Improve the videophone</li>
+      <li>Prepare aeronautics lectures</li>
+      <li>Work on the alcohol-fuelled engine</li>
+    </ul>
+  );
+}
+The next time you see {{ and }} in JSX, know that it’s nothing more than an object inside the JSX curlies!
+*** Inline style properties are written in camelCase. For example, HTML <ul style="background-color: black"> would be written as <ul style={{ backgroundColor: 'black' }}>  in your component. ***
+
+CLEVER:
+const person = {
+  name: 'Gregorio Y. Zara',
+  theme: {
+    backgroundColor: 'black',
+    color: 'pink'
+  }
+};
+
+export default function TodoList() {
+  return (
+    <div style={person.theme}> // applies the styles from person.theme to the element
+
+# Rendering and Conditional Rendering # 
+function App() {
+  const animals = ["Lion", "Cow", "Snake", "Lizard"];
+
+  return (
+    <div>
+      <h1>Animals: </h1>
+      <ul>
+        {animals.map((animal) => { // this can take a list however logn we want and render it all as a list
+          return <li key={animal}>{animal}</li>;
+        })}
+      </ul>
+    </div>
+  );
+}
+*** JSX has the ability to automatically render arrays, therefore these are the same *** 
+function App() {
+  const animals = ["Lion", "Cow", "Snake", "Lizard"];
+  const animalsList = animals.map((animal) => <li key={animal}>{animal}</li>)
+
+  return (
+    <div>
+      <h1>Animals: </h1>
+      <ul>
+        {animalsList}
+      </ul>
+    </div>
+  );
+}
+----------------------
+
+function ListItem(props) {
+  return <li>{props.animal}</li>
+}
+function List(props) {
+  return (
+    <ul>
+      {props.animals.map((animal) => {
+        return <ListItem key={animal} animal={animal} />;
+      })}
+    </ul>
+  );
+}
+function App() {
+  const animals = ["Lion", "Cow", "Snake", "Lizard"];
+
+  return (
+    <div>
+      <h1>Animals: </h1>
+      <List animals={animals} />
+    </div>
+  );
+}
+
