@@ -133,14 +133,43 @@ function List(props) {
   return (
     <ul>
       {props.animals.map((animal) => {
-        return <ListItem key={animal} animal={animal} />;
+        return animal.startsWith("L") ? <ListItem key={animal} animal={animal} /> : null;
+        // we return null to indicate that no element will be rendered.
+  //         return animal.startsWith("L") && <li key={animal}>{animal}</li>;
+This also works - if the first clause/condition is true then the second clause after && runs. if not, it's false
+When using && for conditional rendering, don’t put numbers on the left side. The React docs on conditional rendering provide more details about this in the Pitfall box in the section about &&.
+      })}
+    </ul>
+  );
+}
+---------------
+
+function App() {
+  const animals = ["Lion", "Cow", "Snake", "Lizard"];
+  return (
+    <div>
+      <h1>Animals: </h1>
+      <List animals={animals} />
+    </div>
+  );
+}
+function List(props) {
+  if (!props.animals) {
+    return <div>Loading...</div>;
+  }
+  if (props.animals.length === 0) {
+    return <div>There are no animals in the list!</div>;
+  }
+  return (
+    <ul>
+      {props.animals.map((animal) => {
+        return <li key={animal}>{animal}</li>;
       })}
     </ul>
   );
 }
 function App() {
-  const animals = ["Lion", "Cow", "Snake", "Lizard"];
-
+  const animals = [];
   return (
     <div>
       <h1>Animals: </h1>
@@ -149,3 +178,47 @@ function App() {
   );
 }
 
+-------------
+
+function List(props) {
+  return (
+    <>
+      {!props.animals ? (
+        <div>Loading...</div>
+      ) : props.animals.length > 0 ? (
+        <ul>
+          {props.animals.map((animal) => {
+            return <li key={animal}>{animal}</li>;
+          })}
+        </ul>
+      ) : (
+        <div>There are no animals in the list!</div>
+      )}
+    </>
+  );
+}
+// OR
+function List(props) {
+  return (
+    <>
+      {!props.animals && <div>Loading...</div>}
+      {props.animals && props.animals.length > 0 && (
+        <ul>
+          {props.animals.map((animal) => {
+            return <li key={animal}>{animal}</li>;
+          })}
+        </ul>
+      )}
+      {props.animals && props.animals.length === 0 && <div>There are no animals in the list!</div>}
+    </>
+  );
+}
+function App() {
+  const animals = [];
+  return (
+    <div>
+      <h1>Animals: </h1>
+      <List animals={animals} />
+    </div>
+  );
+} 
