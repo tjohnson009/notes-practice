@@ -410,8 +410,40 @@ const listItems = people.map(person => <li>{person}</li>);
 Return listItems from your component wrapped in a <ul>:
 return <ul>{listItems}</ul>;
 
-***You need to give each array item a key — a string or a number that uniquely identifies it among other items in that array: ***
+
+
 ### KEYS ###
+Keys are special props for components. Props are arguments passed into react components. 
+Now imagine, if any of the items in the list on the DOM were to change, how would React know which item to update?
+If the list were to change, one of two things should happen:
+- we completely re-render the entire list, or
+- we hunt down the specific items that were changed and only re-render those. (we assume this because it's not as costly in memory - therefore we need keys). Whenever a list is updated React mataches the keys of each of the previous list items to the updated list. If there are changes, React only updates the items that have changed. 
+<Component key={keyValue} />
+//or
+<div key={keyValue} />
+
+// a list of todos, each todo object has a task and an id
+const todos = [
+  { task: "mow the yard", id: crypto.randomUUID() },
+  { task: "Work on Odin Projects", id: crypto.randomUUID() },
+  { task: "feed the cat", id: crypto.randomUUID() },
+];
+function TodoList() {
+  return (
+    <ul>
+      {todos.map((todo) => (
+        // here we are using the already generated id as the key.
+        // do not write crypto.randomUUID() for the key during render
+        <li key={todo.id}>{todo.task}</li>
+      ))}
+    </ul>
+  );
+}
+
+Keys should NEVER be generated on the fly. Using key={Math.random()} or key={crypto.randomUUID()} *while* rendering the list defeats the purpose of the key, as now a new key will get created for every render of the list. Keys should always be inferred from the data directly. 
+
+
+***You need to give each array item a key — a string or a number that uniquely identifies it among other items in that array: ***
 <li key={person.id}>...</li>
 JSX elements directly inside a map() call always need keys!
 Keys tell React which array item each component corresponds to, so that it can match them up later. This becomes important if your array items can move (e.g. due to sorting), get inserted, or get deleted. A well-chosen key helps React infer what exactly has happened, and make the correct updates to the DOM tree. You should generate the keys directly in your data:
@@ -497,3 +529,4 @@ export default function Poem() {
     </article>
   );
 }
+
