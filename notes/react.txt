@@ -394,7 +394,7 @@ export default function DrinkList() {
   );
 }
 
-## Rendering Lists ##
+### Rendering Lists ###
 Here’s a short example of how to generate a list of items from an array:
 
 Move the data into an array:
@@ -426,7 +426,7 @@ If the list were to change, one of two things should happen:
 const todos = [
   { task: "mow the yard", id: crypto.randomUUID() },
   { task: "Work on Odin Projects", id: crypto.randomUUID() },
-  { task: "feed the cat", id: crypto.randomUUID() },
+  { task: "feed the cat", id: crypto.randomUUID() }, 
 ];
 function TodoList() {
   return (
@@ -441,7 +441,6 @@ function TodoList() {
 }
 
 Keys should NEVER be generated on the fly. Using key={Math.random()} or key={crypto.randomUUID()} *while* rendering the list defeats the purpose of the key, as now a new key will get created for every render of the list. Keys should always be inferred from the data directly. 
-
 
 ***You need to give each array item a key — a string or a number that uniquely identifies it among other items in that array: ***
 <li key={person.id}>...</li>
@@ -530,3 +529,138 @@ export default function Poem() {
   );
 }
 
+### PASSING DATA BETWEEN PROPS ###
+How can I share information between components? - Enter PROPS (React properties)
+In React, data is transferred from parent components to child components via props. The flow is UNIDIRECTIONAL - meaning it only flows in one direction. 
+THEREFORE any changes made to this data will only affect child components using the data, and not parent or sibling components.
+
+function Button(props) { // The Button functional component now receives props as a function argument.
+  // if we need to have mutltiple buttons, having props can help us not repeat ourselves or make multiple components
+  const buttonStyle = {
+    color: props.color, // props.propertyName for the reference
+    fontSize: props.fontSize + 'px'
+  };
+
+  return (
+    <button style={buttonStyle}>{props.text}</button>  // the prop values are defined on each component while rendering
+  );
+}
+export default function App() {
+  return (
+    <div>
+      <Button text="Click Me!" color="blue" fontSize={12} />
+      <Button text="Don't Click Me!" color="red" fontSize={12} />
+      <Button text="Click Me!" color="blue" fontSize={20} />
+    </div>
+  );
+}
+
+function Button({ text, color, fontSize }) { // DESTRUCTURING WITHIN THE SAME EXAMPLE _ VERY COMMON
+  const buttonStyle = {
+    color: color,
+    fontSize: fontSize + "px"
+  };
+  return <button style={buttonStyle}>{text}</button>;
+}
+export default function App() {
+  return (
+    <div>
+      <Button text="Click Me!" color="blue" fontSize={12} />
+      <Button text="Don't Click Me!" color="red" fontSize={12} />
+      <Button text="Click Me!" color="blue" fontSize={20} />
+    </div>
+  );
+}
+Props are like properties incuded in the Button component in the JSX element itself. 
+
+* Default Props *
+  function Button({ text = "Click Me!", color = "blue", fontSize = 12 }) { // default props also a possibility
+     const buttonStyle = {
+      color: color,
+      fontSize: fontSize + "px"
+    };
+
+    return <button style={buttonStyle}>{text}</button>;
+  }
+  export default function App() {
+    return (
+      <div>
+        <Button />
+        <Button text="Don't Click Me!" color="red" />
+        <Button fontSize={20} />
+      </div>
+    );
+  }
+Now we only need to supply prop values to Button when rendering within App if they differ from the default values defined in the function parameters.
+There also used to be a set word called defaultProps:
+
+function Button({ text, color, fontSize }) {
+  const buttonStyle = {
+    color: color,
+    fontSize: fontSize + "px"
+  };
+  return <button style={buttonStyle}>{text}</button>;
+}
+Button.defaultProps = { // you might see this in older codebases
+  text: "Click Me!",
+  color: "blue",
+  fontSize: 12
+};
+export default function App() {
+  return (
+    <div>
+      <Button />
+      <Button text="Don't Click Me!" color="red" />
+      <Button fontSize={20} />
+    </div>
+  );
+}
+
+WE CAN ALSO PASS FUNCTIONS AS PROPS: 
+function Button({ text = "Click Me!", color = "blue", fontSize = 12, handleClick }) {
+  const buttonStyle = {
+    color: color,
+    fontSize: fontSize + "px"
+  };
+  return (
+    <button onClick={handleClick} style={buttonStyle}>
+      {text}
+    </button>
+  );
+}
+export default function App() {
+  const handleButtonClick = () => {
+    window.location.href = "https://www.google.com";
+  };
+  return (
+    <div>
+      <Button handleClick={handleButtonClick} />
+    </div>
+  );
+}
+- We only pass through a reference to handleButtonClick, i.e. we do not include parenthesis when passing the function to Button. If we were to do something like handleClick={handleButtonClick()} then the function would be called as the button renders.
+
+- Every Button calling this function will navigate to the same page. We can refactor the function and supply an argument within Button to customize this functionality.
+
+function Button({ text = "Click Me!", color = "blue", fontSize = 12, handleClick }) {
+  const buttonStyle = {
+    color: color,
+    fontSize: fontSize + "px"
+  };
+  return (
+    <button onClick={handleClick} style={buttonStyle}>
+      {text}
+    </button>
+  );
+}
+
+export default function App() {
+  const handleButtonClick = (url) => { // this version has a property that changes the destination of the click
+    window.location.href = url;
+  };
+  return (
+    <div>
+      <Button handleClick={() => handleButtonClick('www.theodinproject.com')} /> 
+    </div>
+  );
+}
