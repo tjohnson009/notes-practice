@@ -529,10 +529,71 @@ export default function Poem() {
   );
 }
 
-### PASSING DATA BETWEEN PROPS ###
+### PASSING DATA WITH PROPS ###
 How can I share information between components? - Enter PROPS (React properties)
+React components use props to communicate with each other. Every parent component can pass some information to its child components by giving them props. 
+Props might remind you of HTML attributes, but you can pass any JavaScript value through them, including objects, arrays, and functions.
 In React, data is transferred from parent components to child components via props. The flow is UNIDIRECTIONAL - meaning it only flows in one direction. 
 THEREFORE any changes made to this data will only affect child components using the data, and not parent or sibling components.
+React component functions accept a single argument, a props object. You can think of props like “knobs” that you can adjust. 
+
+Props are the information that you pass to a JSX tag. The props you can pass to an <img> tag are predefined (ReactDOM conforms to the HTML standard). 
+But you can pass ANY props to your own components, such as <Avatar>, to customize them. Usually you don’t need the whole props object itself, so you destructure it into individual props.
+
+export default function Profile() {
+  return (
+    <Avatar
+      person={{ name: 'Lin Lanying', imageId: '1bX5QH6' }} // an object inside of JSX
+      size={100}
+    />
+  );
+}
+function Avatar({ person, size }) { // props go here in this form - don't forget the curly braces
+  // person and size are available here
+}
+
+function Avatar({ person, size = 100 }) { // default props
+  // ...
+} 
+and this are equal: 
+function Avatar(props) {
+  let person = props.person;
+  let size = props.size;
+  // ...
+}
+
+function Profile(props) {
+  return (
+    <div className="card">
+      <Avatar {...props} />
+    </div>
+  );
+}
+This forwards all of Profile’s props to the Avatar without listing each of their names.
+
+When you nest content inside a JSX tag, the parent component will receive that content in a prop called children. 
+For example, the Card component below will receive a children prop set to <Avatar /> and render it in a wrapper div:
+import Avatar from './Avatar.js';
+function Card({ children }) {
+  return (
+    <div className="card">
+      {children}
+    </div>
+  );
+}
+export default function Profile() {
+  return (
+    <Card>
+      <Avatar
+        size={100}
+        person={{ 
+          name: 'Katsuko Saruhashi',
+          imageId: 'YfeOqp2'
+        }}
+      />
+    </Card>
+  );
+}
 
 function Button(props) { // The Button functional component now receives props as a function argument.
   // if we need to have mutltiple buttons, having props can help us not repeat ourselves or make multiple components
@@ -640,7 +701,7 @@ export default function App() {
 }
 - We only pass through a reference to handleButtonClick, i.e. we do not include parenthesis when passing the function to Button. If we were to do something like handleClick={handleButtonClick()} then the function would be called as the button renders.
 
-- Every Button calling this function will navigate to the same page. We can refactor the function and supply an argument within Button to customize this functionality.
+- Every Button calling this function will navigate to the same page. We can refactor the function and supply an argument within the Button to customize this functionality.
 
 function Button({ text = "Click Me!", color = "blue", fontSize = 12, handleClick }) {
   const buttonStyle = {
@@ -653,7 +714,6 @@ function Button({ text = "Click Me!", color = "blue", fontSize = 12, handleClick
     </button>
   );
 }
-
 export default function App() {
   const handleButtonClick = (url) => { // this version has a property that changes the destination of the click
     window.location.href = url;
@@ -664,3 +724,23 @@ export default function App() {
     </div>
   );
 }
+When supplying an argument to the function we can’t just write onClick={handleClick('www.theodinproject.com')}, and instead must attach a reference to an anonymous function which then calls the function with the argument.
+
+*** Props can change over time ***
+export default function Clock({ color, time }) {
+  return (
+    <h1 style={{ color: color }}>
+      {time}
+    </h1>
+  );
+}
+A component may receive different props over time. Props are not always static! Here, the time prop changes every second, 
+and the color prop changes when you select another color. Props reflect a component’s data at any point in time, rather 
+than only in the beginning.
+
+However, props are immutable—a term from computer science meaning “unchangeable”. When a component needs to change its props 
+(for example, in response to a user interaction or new data), it will have to “ask” its parent component to pass it different props
+— a new object! Its old props will then be cast aside, and eventually the JavaScript engine will reclaim the memory taken by them.
+
+Don’t try to “change props”. Props are read-only snapshots in time: every render receives a new version of props. When you need to 
+respond to the user input (like changing the selected color), you will need to “set state”. 
