@@ -20,7 +20,8 @@ This will tell Vite to use the current directory for the project, instead of cre
 with the given project name. This cloned directory will already be initialized as a git repo and connected to the right remote.
 
 # REACT COMPONENTS #
-The beauty of React is that it allows you to break a UI (User Interface) down into independent reusable chunks, which we will refer to as components. Think of these reusable chunks as JavaScript functions which can take some kind of input and return a React element.
+The beauty of React is that it allows you to break a UI (User Interface) down into independent reusable chunks, which we will refer to as components. 
+Think of these reusable chunks as JavaScript functions which can take some kind of input and return a React element.
 
 function Greeting() {
   return <h1>&quot;I swear by my pretty floral bonnet, I will end you.&quot;</h1>;
@@ -28,6 +29,9 @@ function Greeting() {
 React components return JSX. 
 * React components MUST be capitalized or they will not function as expected, which is why we capitalized Greeting().
 *** For a very long time in React development, it was necessary to import React in your JavaScript files that used React components, but since React v17.0 it is no longer required. ***
+
+There are different kinds of React components:
+
 
 # What is JSX? #
 JSX is a syntax extension for JavaScript that lets you write HTML-like markup inside a JavaScript file. It’s NOT required to use JSX when writing React components, but it does make writing them more concise.
@@ -744,3 +748,64 @@ However, props are immutable—a term from computer science meaning “unchangea
 
 Don’t try to “change props”. Props are read-only snapshots in time: every render receives a new version of props. When you need to 
 respond to the user input (like changing the selected color), you will need to “set state”. 
+
+# STATE IN REACT #
+What is state? No matter if you work in web development, frontend or backend, with JavaScript, with a framework like React, Angular or Vue or without one - you will be working with state!
+The state is the combination of all the data we currently have in our appliication. 
+
+"State" is really just that: The state (i.e. "current snapshot") of your program or of a part of it - depending on how you look at it.
+A component needs to “remember” things about itself. This is where state comes in. State is a component’s memory.
+
+EXAMPLE:
+import React, { useState } from "react";
+import "./App.css";
+const COLORS = ["pink", "green", "blue", "yellow", "purple"];
+
+function App() {
+  const [backgroundColor, setBackgroundColor] = useState(COLORS[0]);
+  const onButtonClick = (color) => () => {
+    setBackgroundColor(color);
+  };
+  return (
+    <div
+      className="App"
+      style={{
+        backgroundColor,
+      }}
+    >
+      {COLORS.map((color) => (
+        <button
+          type="button"
+          key={color}
+          onClick={onButtonClick(color)}
+          className={backgroundColor === color ? "selected" : ""}
+        >
+          {color}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+
+The useState hook is a built-in hook in React that allows you to define state in a functional component. 
+It takes an initial value as a parameter and returns an array with two elements that we can destructure to get:
+- The current state value
+- A function to update the state value
+
+const [stateValue, setStateValue] = useState(initialValue);
+// adapted for our use case:
+const [backgroundColor, setBackgroundColor] = useState(initialColor);
+
+** How does state work under the hood? **
+In React, when a component’s state or props change, the component is destroyed and recreated from scratch. 
+The entire component is recreated but this time the latest state value will be returned from useState. 
+This process is called rerendering. Rerendering is a key feature of React that enables it to efficiently 
+update the user interface in response to changes in the underlying data.
+
+## HOOKS ##
+Hooks are functions that let you use React features. All hooks are recognizable by the use prefix. 
+For example, useState is a hook. For now, remember that hooks have rules that we need to abide by:
+- Hooks can only be called from the top level of a functional component.
+- Hooks can’t be called from inside loops or conditions.
+
