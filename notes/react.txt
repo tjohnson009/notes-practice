@@ -751,10 +751,15 @@ respond to the user input (like changing the selected color), you will need to �
 
 # STATE IN REACT #
 What is state? No matter if you work in web development, frontend or backend, with JavaScript, with a framework like React, Angular or Vue or without one - you will be working with state!
-The state is the combination of all the data we currently have in our appliication. 
+The state is the combination of all the data we currently have in our appliication. Component-specific memory is called state.
 
 "State" is really just that: The state (i.e. "current snapshot") of your program or of a part of it - depending on how you look at it.
 A component needs to “remember” things about itself. This is where state comes in. State is a component’s memory.
+You can have as many state variables of as many types as you like in one component.
+export default function Gallery() {
+  const [index, setIndex] = useState(0);
+  const [showMore, setShowMore] = useState(false);
+  ... }
 
 EXAMPLE:
 import React, { useState } from "react";
@@ -762,7 +767,7 @@ import "./App.css";
 const COLORS = ["pink", "green", "blue", "yellow", "purple"];
 
 function App() {
-  const [backgroundColor, setBackgroundColor] = useState(COLORS[0]);
+  const [backgroundColor, setBackgroundColor] = useState(COLORS[0]); // the only argument for useState is the initial value of your variable
   const onButtonClick = (color) => () => {
     setBackgroundColor(color);
   };
@@ -787,11 +792,15 @@ function App() {
   );
 }
 
+To update a component with new data, two things need to happen:
+- Retain the data between renders.
+- Trigger React to render the component with new data (re-rendering).
 
 The useState hook is a built-in hook in React that allows you to define state in a functional component. 
 It takes an initial value as a parameter and returns an array with two elements that we can destructure to get:
 - The current state value
-- A function to update the state value
+- A function to update the state variable and trigger React to render the component again
+The array returned by useState always has exactly two items.
 
 const [stateValue, setStateValue] = useState(initialValue);
 // adapted for our use case:
@@ -803,9 +812,178 @@ The entire component is recreated but this time the latest state value will be r
 This process is called rerendering. Rerendering is a key feature of React that enables it to efficiently 
 update the user interface in response to changes in the underlying data.
 
-## HOOKS ##
-Hooks are functions that let you use React features. All hooks are recognizable by the use prefix. 
+* STATE IS ISOLATED AND PRIVATE *
+If you render the same component twice, each copy will have completely isolated state! 
+
+It is a good idea to have multiple state variables in a single component if their state is unrelated, like index and showMore in this example. 
+But if you find that you often change two state variables together, it might be easier to combine them into one. For example, 
+if you have a form with many fields, it’s more convenient to have a single state variable that holds an object than state 
+variable per field. 
+
+Unlike props, state is FULLY PRIVATE to the component declaring it. The parent component can’t change it. This lets you add state 
+to any component or remove it without impacting the rest of the components.
+
+What if you wanted two components to keep their states in sync? The right way to do it in React is to remove state from 
+child components and add it to their closest shared parent.
+
+import {useState} from 'react';
+export default function Form() {
+  // let firstName = '';
+  // let lastName = '';
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+
+  function handleFirstNameChange(e) {
+    // firstName = e.target.value;
+    setFirstName(e.target.value)
+  }
+  function handleLastNameChange(e) {
+    // lastName = e.target.value;
+    setLastName(e.target.value); 
+  }
+  function handleReset() {
+    firstName = '';
+    lastName = '';
+  }
+  return (
+    <form onSubmit={e => e.preventDefault()}>
+      <input
+        placeholder="First name"
+        value={firstName}
+        onChange={handleFirstNameChange}
+      />
+      <input
+        placeholder="Last name"
+        value={lastName}
+        onChange={handleLastNameChange}
+      />
+      <h1>Hi, {firstName} {lastName}</h1>
+      <button onClick={handleReset}>Reset</button>
+    </form>
+  );
+}
+
+A state variable is only necessary to keep information between re-renders of a component. Within a single event handler, 
+a regular variable will do fine. Don’t introduce state variables when a regular variable works well.
+
+Imagine that your components are cooks in a kitchen that serve UI, React is the waiter. The process of requesting and serving 
+UI has three steps:
+- Triggering a render (delivering the guest’s order to the kitchen):
+There are two reasons for a component to render:
+1. It’s the component’s initial render.
+import Image from './Image.js';
+import { createRoot } from 'react-dom/client';
+const root = createRoot(document.getElementById('root'))
+root.render(<Image />);
+2. The component’s (or one of its ancestors’) state has been updated.
+
+- Rendering the component (preparing the order in the kitchen)
+1. “Rendering” is React calling your components.
+2. On initial render, React will call the root component.
+3. For subsequent renders, React will call the function component whose state update triggered the render.
+
+* Rendering must always be a pure calculation:
+- ** Same inputs, same output: ** Given the same inputs, a component should always return the same JSX. 
+(When someone orders a salad with tomatoes, they should not receive a salad with onions!)
+- ** It minds its own business: ** It should not change any objects or variables that existed before rendering. 
+(One order should not change anyone else’s order.)
+Otherwise, you can encounter confusing bugs and unpredictable behavior as your codebase grows in complexity. 
+When developing in “Strict Mode”, React calls each component’s function twice, which can help surface mistakes 
+caused by impure functions.
+- Committing to the DOM (placing the order on the table)
+1. For the initial render, React will use the appendChild() DOM API to put all the DOM nodes it has created on screen.
+2. For re-renders, React will apply the minimal necessary operations (calculated while rendering!) to make the DOM match 
+the latest rendering output.
+React only changes the DOM nodes if there’s a difference between renders. For example, here is a component that 
+re-renders with different props passed from its parent every second. 
+
+## HOW TO STRUCTURE STATE ##
+1. RULE #1: DO NOT put values in state that can be calculated using existing values, state, and/or props.
+2. Rule #2: State should NOT be mutated
+  - Mutating state is a no-go area in React as it leads to unpredictable results.
+  - We should treat state as if it was immutable. To change state, we should always use the setState function, 
+  which in the case of the example below is the setPerson function.
+
+    // BAD - Don't do this!
+  const handleIncreaseAge = () => {
+    // mutating the current state object
+    person.age = person.age + 1;
+    setPerson(person);
+  };
+
+  // GOOD - Do this!
+  const handleIncreaseAge = () => {
+    // copy the existing person object into a new object
+    // while updating the age property
+    const newPerson = { ...person, age: person.age + 1 };
+    setPerson(newPerson);
+  };
+* If we don’t provide a new object to setState it is not guaranteed to re-render the page. Therefore, we should always 
+provide a new Object for setState to trigger a re-render. 
+
+3. State updates are ASYNCHRONOUS
+ - What this implies is that whenever you call the setState function, React will apply the update in the *NEXT* component render.
+ - state variables are NOT reactive - the component is
+
+ The state stays the same throughout the current render of the component. This is what “state as a snapshot” refers to. 
+ The setState call triggers a component re-render, and the person state is updated to the new value.
+
+ function Component() { // this is an infinite loop - eachh setCount rerenders the component thus calling setCount again
+  const [count, setCount] = useState(0);
+  setCount(count + 1);
+  return <h1>{count}</h1>;
+}
+
+
+
+# HOOKS #
+Hooks are functions that let you use React features. All hooks are recognizable by the "use" prefix. 
+Hooks are special functions that are only available while React is rendering. They let you “hook into” different React features.
 For example, useState is a hook. For now, remember that hooks have rules that we need to abide by:
 - Hooks can only be called from the top level of a functional component.
-- Hooks can’t be called from inside loops or conditions.
+- Hooks can’t be called from inside loops or conditions. 
+It is very IMPORTANT that all calls to Hooks happen BEFORE the first return statement.
+
+Hooks—functions starting with use—can only be called at the top level of your components or your own Hooks. You can’t call Hooks 
+inside conditions, loops, or other nested functions. Hooks are functions, but it’s helpful to think of them as unconditional 
+declarations about your component’s needs. You “use” React features at the top of your component similar to how you “import” 
+modules at the top of your file.
+
+import { useState } from 'react';
+import { sculptureList } from './data.js';
+
+export default function Gallery() {
+  const [index, setIndex] = useState(0);
+  const [showMore, setShowMore] = useState(false);
+  function handleNextClick() {
+    setIndex(index + 1);
+  }
+  function handleMoreClick() {
+    setShowMore(!showMore);
+  }
+  let sculpture = sculptureList[index];
+  return (
+    <>
+      <button onClick={handleNextClick}>
+        Next
+      </button>
+      <h2>
+        <i>{sculpture.name} </i> 
+        by {sculpture.artist}
+      </h2>
+      <h3>  
+        ({index + 1} of {sculptureList.length})
+      </h3>
+      <button onClick={handleMoreClick}>
+        {showMore ? 'Hide' : 'Show'} details
+      </button>
+      {showMore && <p>{sculpture.description}</p>}
+      <img 
+        src={sculpture.url} 
+        alt={sculpture.alt}
+      />
+    </>
+  );
+}
+
 
