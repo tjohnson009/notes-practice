@@ -10,7 +10,9 @@ Dr. Barbara Oakleys course of How To Learn
 Networking is absolutely key - use twitter and linkedin to reach out to people and connect - set up coffee talks
 
 # HOW TO LEARN #
-Rereading and/or highlighting is not the best way to learn
+Rereading and/or highlighting is NOT the best way to learn
+
+The harder you have to work to remember something, the stronger those connections get. 
 
 ACTIVE RECALL and SPACED REPITITION are the scientifically proven best ways to retain and learn information
 - When you get to end of a paragraph, stop and talk to yourself about the things you just learned / rubber duck recall

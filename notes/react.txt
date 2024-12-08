@@ -418,6 +418,7 @@ return <ul>{listItems}</ul>;
 
 ### KEYS ###
 Keys are special props for components. Props are arguments passed into react components. 
+*Props are reactive!*
 Now imagine, if any of the items in the list on the DOM were to change, how would React know which item to update?
 If the list were to change, one of two things should happen:
 - we completely re-render the entire list, or
@@ -535,6 +536,12 @@ export default function Poem() {
 
 ### PASSING DATA WITH PROPS ###
 How can I share information between components? - Enter PROPS (React properties)
+
+Props are reactive!!
+
+If the color prop changes, React automatically re-renders the component with the new props.color value.
+There's no need for state (useState) in some cases because the color is derived directly from the props.
+
 React components use props to communicate with each other. Every parent component can pass some information to its child components by giving them props. 
 Props might remind you of HTML attributes, but you can pass any JavaScript value through them, including objects, arrays, and functions.
 In React, data is transferred from parent components to child components via props. The flow is UNIDIRECTIONAL - meaning it only flows in one direction. 
@@ -742,7 +749,7 @@ A component may receive different props over time. Props are not always static! 
 and the color prop changes when you select another color. Props reflect a component’s data at any point in time, rather 
 than only in the beginning.
 
-However, props are immutable—a term from computer science meaning “unchangeable”. When a component needs to change its props 
+However, props are immutable — a term from computer science meaning “unchangeable”. When a component needs to change its props 
 (for example, in response to a user interaction or new data), it will have to “ask” its parent component to pass it different props
 — a new object! Its old props will then be cast aside, and eventually the JavaScript engine will reclaim the memory taken by them.
 
@@ -807,7 +814,7 @@ const [stateValue, setStateValue] = useState(initialValue);
 const [backgroundColor, setBackgroundColor] = useState(initialColor);
 
 ** How does state work under the hood? **
-In React, when a component’s state or props change, the component is destroyed and recreated from scratch. 
+* In React, when a component’s state or props change, the component is destroyed and recreated from scratch. 
 The entire component is recreated but this time the latest state value will be returned from useState. 
 This process is called rerendering. Rerendering is a key feature of React that enables it to efficiently 
 update the user interface in response to changes in the underlying data.
@@ -897,9 +904,174 @@ the latest rendering output.
 React only changes the DOM nodes if there’s a difference between renders. For example, here is a component that 
 re-renders with different props passed from its parent every second. 
 
+* Setting State does not change the state variable you already have, but instead triggers a re-render. Setting state triggers re-renders. Setting state only changes state for the NEXT render.
+- Rendering takes a snapshot of the UI in time. Its props, event handlers, and local variables were all calculated using its state at the time of the render. The UI snapshot is interactive. 
+
+When React re-renders a component:
+1. React calls your function again.
+2. Your function returns a new JSX snapshot.
+3. React then updates the screen to match the snapshot your function returned.
+
+- A state variable’s value never changes within a render. 
+- React keeps the state values “fixed” within one render’s event handlers.
+
+
 ## HOW TO STRUCTURE STATE ##
-1. RULE #1: DO NOT put values in state that can be calculated using existing values, state, and/or props.
-2. Rule #2: State should NOT be mutated
+1. *Group related state*: If you always update two or more state variables at the same time, consider merging them into a single state variable.
+const [x, setX] = useState(0);
+const [y, setY] = useState(0);
+OR 
+* const [position, setPosition] = useState({ x: 0, y: 0 });
+Grouping state is also helpful when you don't know how many state variables you need. 
+* If your state variable is an object, remember that you CANNOT update only one field in it without explicitly copying the other fields. For example, you can’t do setPosition({ x: 100 }) in the above example because it would not have the y property at all! Instead, if you wanted to set x alone, you would either do setPosition({ ...position, x: 100 }), or split them into two state variables and do setX(100).
+
+2. *Avoid contradictions in state*: When the state is structured in a way that several pieces of state may contradict and “disagree” with each other, you leave room for mistakes. Try to avoid this.
+- Consider an example of a messaging app where state variables sent and sending are present and cannot both be true at the same time.
+Since isSending and isSent should never be true at the same time, it is better to replace them with one status state variable that may take one of three valid states: 'typing' (initial), 'sending', and 'sent'. 
+
+3. *Avoid redundant state*: If you can calculate some information from the component’s props or its existing state variables during rendering, you should not put that information into that component’s state.
+* DO NOT put values in state that can be calculated using existing values, state, and/or props.
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [fullName, setFullName] = useState('');
+  REDUNDANT
+
+DO NOT copy props into state unless you want to ignore future updates to the prop. Instead, use the prop directly, or rename it with a constant for clarity. If you must copy it, name it with 'initial' or 'default' to signal that updates to the prop will be ignored.
+
+4. *Avoid duplication in state*: When the same data is duplicated between multiple state variables, or within nested objects, it is difficult to keep them in sync. Reduce duplication when you can.
+- We don't want to have information about state in multiple places; instead we can use that single source to calculate or populate the state where we need it
+
+`import { useState } from 'react';
+const initialItems = [
+  { title: 'pretzels', id: 0 },
+  { title: 'crispy seaweed', id: 1 },
+  { title: 'granola bar', id: 2 },
+];
+export default function Menu() {
+  const [items, setItems] = useState(initialItems);
+  const [selectedId, setSelectedId] = useState(0);
+  const selectedItem = items.find(item =>
+    item.id === selectedId
+  );
+
+  function handleItemChange(id, e) {
+    setItems(items.map(item => {
+      if (item.id === id) {
+        return {
+          ...item,
+          title: e.target.value,
+        };
+      } else {
+        return item;
+      }
+    }));
+  }
+  return (
+    <>
+      <h2>What's your travel snack?</h2>
+      <ul>
+        {items.map((item, index) => (
+          <li key={item.id}>
+            <input
+              value={item.title}
+              onChange={e => {
+                handleItemChange(item.id, e)
+              }}
+            />
+            {' '}
+            <button onClick={() => {
+              setSelectedId(item.id);
+            }}>Choose</button>
+          </li>
+        ))}
+      </ul>
+      <p>You picked {selectedItem.title}.</p>
+    </>
+  );
+}
+
+
+The state used to be duplicated like this:
+  items = [{ id: 0, title: 'pretzels'}, ...]
+  selectedItem = {id: 0, title: 'pretzels'}
+
+But after the change it’s like this:
+  items = [{ id: 0, title: 'pretzels'}, ...]
+  selectedId = 0
+The duplication is gone, and you only keep the essential state! You didn’t need to hold the selected item in state, because only the selected ID is essential. The rest could be calculated during render.
+
+5. *Avoid deeply nested state*: Deeply hierarchical state is not very convenient to update. When possible, prefer to structure state in a flat way.
+- Updating nested state involves making copies of objects all the way up from the part that changed. Deleting a deeply nested place would involve copying its entire parent place chain. Such code can be very verbose.
+- If the state is too nested to update easily, consider making it “flat” or "normalized".
+
+import { useState } from 'react';
+import { initialTravelPlan } from './places.js';
+export default function TravelPlan() {
+  const [plan, setPlan] = useState(initialTravelPlan);
+  function handleComplete(parentId, childId) {
+    const parent = plan[parentId];
+    // Create a new version of the parent place
+    // that doesn't include this child ID.
+    const nextParent = {
+      ...parent,
+      childIds: parent.childIds
+        .filter(id => id !== childId)
+    };
+    // Update the root state object...
+    setPlan({
+      ...plan,
+      // ...so that it has the updated parent.
+      [parentId]: nextParent
+    });
+  }
+  const root = plan[0];
+  const planetIds = root.childIds;
+  return (
+    <>
+      <h2>Places to visit</h2>
+      <ol>
+        {planetIds.map(id => (
+          <PlaceTree
+            key={id}
+            id={id}
+            parentId={0}
+            placesById={plan}
+            onComplete={handleComplete}
+          />
+        ))}
+      </ol>
+    </>
+  );
+}
+function PlaceTree({ id, parentId, placesById, onComplete }) {
+  const place = placesById[id];
+  const childIds = place.childIds;
+  return (
+    <li>
+      {place.title}
+      <button onClick={() => {
+        onComplete(parentId, id);
+      }}>
+        Complete
+      </button>
+      {childIds.length > 0 &&
+        <ol>
+          {childIds.map(childId => (
+            <PlaceTree
+              key={childId}
+              id={childId}
+              parentId={id}
+              placesById={placesById}
+              onComplete={onComplete}
+            />
+          ))}
+        </ol>
+      }
+    </li>
+  );
+}
+
+* Rule #2: State should NOT be mutated
   - Mutating state is a no-go area in React as it leads to unpredictable results.
   - We should treat state as if it was immutable. To change state, we should always use the setState function, 
   which in the case of the example below is the setPerson function.
@@ -918,10 +1090,10 @@ re-renders with different props passed from its parent every second.
     const newPerson = { ...person, age: person.age + 1 };
     setPerson(newPerson);
   };
-* If we don’t provide a new object to setState it is not guaranteed to re-render the page. Therefore, we should always 
+- If we don’t provide a new object to setState it is not guaranteed to re-render the page. Therefore, we should always 
 provide a new Object for setState to trigger a re-render. 
 
-3. State updates are ASYNCHRONOUS
+* State updates are ASYNCHRONOUS
  - What this implies is that whenever you call the setState function, React will apply the update in the *NEXT* component render.
  - state variables are NOT reactive - the component is
 
@@ -933,6 +1105,42 @@ provide a new Object for setState to trigger a re-render.
   setCount(count + 1);
   return <h1>{count}</h1>;
 }
+
+### State updater functions ###
+const handleIncreaseAge = () => { // this does NOT update state twice!!!
+  setPerson({ ...person, age: person.age + 1 });
+  setPerson({ ...person, age: person.age + 1 });
+}; - this performs the same action twice but it doesn't rerender so it essentially => 100 + 1 and then 100 + 1 again
+
+1. The component renders for the first time. The person state variable is initialized to { name: 'John', age: 100 }. The “during render” console.log prints the state variable.
+2. The button is clicked invoking handleIncreaseAge. Interestingly, the console.log before and after the setPerson call prints the same value.
+3. The component re-renders. The person state variable is updated to { name: 'John', age: 101 }.
+
+What if I want to update the state multiple times using the latest state?
+const handleIncreaseAge = () => { // passing in the previous person to update the latest state twice
+  setPerson((prevPerson) => ({ ...prevPerson, age: prevPerson.age + 1 }));
+  setPerson((prevPerson) => ({ ...prevPerson, age: prevPerson.age + 1 }));
+};
+
+* Because there are two setState calls, you would think React re-renders the component twice, right? 
+NOPE! Wherever possible, React *batches the state updates*. Here, the component only re-renders once. 
+
+### Controlled Components ###
+Some native HTML elements control their own state - like inputs, but we want to control our own inputs for now. 
+
+function CustomInput() {
+  const [value, setValue] = useState("");
+  return (
+    <input
+      type="text"
+      value={value}
+      onChange={(event) => setValue(event.target.value)}
+    />
+  );
+}
+Now, every time the user types something in the input, React will ensure you have the latest comment, review, or post (whatever the user was typing) in value.
+
+
 
 
 
