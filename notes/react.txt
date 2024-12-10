@@ -1140,9 +1140,80 @@ function CustomInput() {
 }
 Now, every time the user types something in the input, React will ensure you have the latest comment, review, or post (whatever the user was typing) in value.
 
+## SHARING STATE BETWEEN COMPONENTS ##
+Remove state from both of them, move it to their closest common parent, and then pass it down to them via props. This is known as *lifting state up*, and it’s one of the most common things you will do writing React code.
 
+To coordinate two states of two different components together, you need to “lift their state up” to a parent component in three steps:
+1. Remove state from the child components.
+- First give control of the components state to the common parent component. Instead, add it as a list of props the components inherits and the common parent has control of the state. 
+2. Pass hardcoded data from the common parent.
+3. Add state to the common parent and pass it down together with the event handlers.
+- Lifting state up often changes the nature of what you’re storing as state. For example, when state is in the component, it might need to store a value as a boolean, but in the parent ciomponent it might need to be an index/number. 
 
+The parent component needs to explicitly allow the child component to change its state by passing an event handler down as a prop:
+<>
+  <Panel
+    isActive={activeIndex === 0}
+    onShow={() => setActiveIndex(0)}
+  >
+    ...
+  </Panel>
+  <Panel
+    isActive={activeIndex === 1}
+    onShow={() => setActiveIndex(1)}
+  >
+    ...
+  </Panel>
+</>
 
+import { useState } from 'react';
+
+export default function Accordion() {
+  const [activeIndex, setActiveIndex] = useState(0);
+  return (
+    <>
+      <h2>Almaty, Kazakhstan</h2>
+      <Panel
+        title="About"
+        isActive={activeIndex === 0}
+        onShow={() => setActiveIndex(0)}
+      >
+        With a population of about 2 million, Almaty is Kazakhstan's largest city. From 1929 to 1997, it was its capital city.
+      </Panel>
+      <Panel
+        title="Etymology"
+        isActive={activeIndex === 1}
+        onShow={() => setActiveIndex(1)}
+      >
+        The name comes from <span lang="kk-KZ">алма</span>, the Kazakh word for "apple" and is often translated as "full of apples". In fact, the region surrounding Almaty is thought to be the ancestral home of the apple, and the wild <i lang="la">Malus sieversii</i> is considered a likely candidate for the ancestor of the modern domestic apple.
+      </Panel>
+    </>
+  );
+}
+
+function Panel({
+  title,
+  children,
+  isActive,
+  onShow
+}) {
+  return (
+    <section className="panel">
+      <h3>{title}</h3>
+      {isActive ? (
+        <p>{children}</p>
+      ) : (
+        <button onClick={onShow}>
+          Show
+        </button>
+      )}
+    </section>
+  );
+}
+
+For each unique piece of state, you will choose the component that “owns” it. This principle is also known as having a “single source of truth”. It doesn’t mean that all state lives in one place—but that for each piece of state, there is a specific component that holds that piece of information. 
+
+Your app will change as you work on it. It is common that you will move state down or back up while you’re still figuring out where each piece of the state “lives”. This is all part of the process!
 
 # HOOKS #
 Hooks are functions that let you use React features. All hooks are recognizable by the "use" prefix. 
