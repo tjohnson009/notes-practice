@@ -534,6 +534,9 @@ export default function Poem() {
   );
 }
 
+React lets you override the default behavior, and force a component to reset its state by passing it a different key, like <Chat key={email} />
+So if the email of the recipient changes, so does the component via resetting. 
+
 ### PASSING DATA WITH PROPS ###
 How can I share information between components? - Enter PROPS (React properties)
 
@@ -923,7 +926,19 @@ const [y, setY] = useState(0);
 OR 
 * const [position, setPosition] = useState({ x: 0, y: 0 });
 Grouping state is also helpful when you don't know how many state variables you need. 
-* If your state variable is an object, remember that you CANNOT update only one field in it without explicitly copying the other fields. For example, you can’t do setPosition({ x: 100 }) in the above example because it would not have the y property at all! Instead, if you wanted to set x alone, you would either do setPosition({ ...position, x: 100 }), or split them into two state variables and do setX(100).
+* If your state variable is an object, remember that you CANNOT update only one field in it without explicitly copying the 
+other fields. For example, you can’t do setPosition({ x: 100 }) in the above example because it would not have the y 
+property at all! Instead, if you wanted to set x alone, you would either do setPosition({ ...position, x: 100 }), or 
+split them into two state variables and do setX(100).
+
+* But you shouldn’t change objects and arrays that you hold in the React state directly. Instead, when you want to 
+update an object and array, you need to create a new one (or make a copy of an existing one), and then update the 
+state to use that copy.
+
+* Just like with objects, when you want to update an array stored in state, you need to create a new one (or make a 
+copy of an existing one), and then set state to use the new array. If copying arrays in code gets tedious, you can 
+use a library like Immer to reduce repetitive code. 
+
 
 2. *Avoid contradictions in state*: When the state is structured in a way that several pieces of state may contradict and “disagree” with each other, you leave room for mistakes. Try to avoid this.
 - Consider an example of a messaging app where state variables sent and sending are present and cannot both be true at the same time.
@@ -1125,6 +1140,133 @@ const handleIncreaseAge = () => { // passing in the previous person to update th
 * Because there are two setState calls, you would think React re-renders the component twice, right? 
 NOPE! Wherever possible, React *batches the state updates*. Here, the component only re-renders once. 
 
+### State Reducer Function -  useReducer ###
+Components with many state updates spread across many event handlers can get overwhelming. For these cases, 
+you can consolidate all the state update logic outside your component in a single function, called “reducer”. 
+Your event handlers become concise because they only specify the user “actions”. 
+
+import { useReducer } from 'react';
+import AddTask from './AddTask.js';
+import TaskList from './TaskList.js';
+export default function TaskApp() {
+  const [tasks, dispatch] = useReducer(
+    tasksReducer,
+    initialTasks
+  );
+  function handleAddTask(text) {
+    dispatch({
+      type: 'added',
+      id: nextId++,
+      text: text,
+    });
+  }
+  function handleChangeTask(task) {
+    dispatch({
+      type: 'changed',
+      task: task
+    });
+  }
+  function handleDeleteTask(taskId) {
+    dispatch({
+      type: 'deleted',
+      id: taskId
+    });
+  }
+
+  return (
+    <>
+      <h1>Prague itinerary</h1>
+      <AddTask
+        onAddTask={handleAddTask}
+      />
+      <TaskList
+        tasks={tasks}
+        onChangeTask={handleChangeTask}
+        onDeleteTask={handleDeleteTask}
+      />
+    </>
+  );
+}
+function tasksReducer(tasks, action) {
+  switch (action.type) {
+    case 'added': {
+      return [...tasks, {
+        id: action.id,
+        text: action.text,
+        done: false
+      }];
+    }
+    case 'changed': {
+      return tasks.map(t => {
+        if (t.id === action.task.id) {
+          return action.task;
+        } else {
+          return t;
+        }
+      });
+    }
+    case 'deleted': {
+      return tasks.filter(t => t.id !== action.id);
+    }
+    default: {
+      throw Error('Unknown action: ' + action.type);
+    }
+  }
+}
+let nextId = 3;
+const initialTasks = [
+  { id: 0, text: 'Visit Kafka Museum', done: true },
+  { id: 1, text: 'Watch a puppet show', done: false },
+  { id: 2, text: 'Lennon Wall pic', done: false }
+];
+
+### useContext ###
+
+import React, { createContext, useContext } from "react";
+// Create a Context for the level
+const LevelContext = createContext(1); // acts as a shared information hub or intranet for all components that need level
+
+export default function App() {
+  return (
+    <Section>
+      <Heading /> 
+      <Section>
+        <Heading />
+        <Section>
+          <Heading />
+        </Section>
+      </Section>
+    </Section>
+  );
+}
+function Section({ children }) {
+  // Get the current level from context
+  const level = useContext(LevelContext); // Each Heading and Section uses useContext(LevelContext) to get the current level.
+
+  return (
+    <LevelContext.Provider value={level + 1}>  // Each Section increments the level it receives by 1 and provides it to its children using the LevelContext.Provider.
+      <div style={{ marginLeft: "20px", border: "1px solid black", padding: "10px" }}>
+        <p>Section Level: {level}</p>
+        {children}
+      </div>
+    </LevelContext.Provider>
+  );
+}
+function Heading() {
+  // Get the current level from context
+  const level = useContext(LevelContext); // Each Heading and Section uses useContext(LevelContext) to get the current level.
+
+  // Dynamically render the heading tag
+  const Tag = `h${level}`;
+  return <Tag>This is an h{level} heading</Tag>;
+}
+
+Why Context is Powerful:
+- Removes the need for prop drilling.
+- Makes the code cleaner and easier to maintain.
+- Lets you share global data (like themes, user info, etc.) across deeply nested components seamlessly.
+
+
 ### Controlled Components ###
 Some native HTML elements control their own state - like inputs, but we want to control our own inputs for now. 
 
@@ -1138,17 +1280,21 @@ function CustomInput() {
     />
   );
 }
-Now, every time the user types something in the input, React will ensure you have the latest comment, review, or post (whatever the user was typing) in value.
+Now, every time the user types something in the input, React will ensure you have the latest comment, review, 
+or post (whatever the user was typing) in value.
 
 ## SHARING STATE BETWEEN COMPONENTS ##
-Remove state from both of them, move it to their closest common parent, and then pass it down to them via props. This is known as *lifting state up*, and it’s one of the most common things you will do writing React code.
+Remove state from both of them, move it to their closest common parent, and then pass it down to them via props. 
+This is known as *lifting state up*, and it’s one of the most common things you will do writing React code.
 
 To coordinate two states of two different components together, you need to “lift their state up” to a parent component in three steps:
 1. Remove state from the child components.
-- First give control of the components state to the common parent component. Instead, add it as a list of props the components inherits and the common parent has control of the state. 
+- First give control of the components state to the common parent component. Instead, add it as a list of props the components 
+inherits and the common parent has control of the state. 
 2. Pass hardcoded data from the common parent.
 3. Add state to the common parent and pass it down together with the event handlers.
-- Lifting state up often changes the nature of what you’re storing as state. For example, when state is in the component, it might need to store a value as a boolean, but in the parent ciomponent it might need to be an index/number. 
+- Lifting state up often changes the nature of what you’re storing as state. For example, when state is in the component, 
+it might need to store a value as a boolean, but in the parent ciomponent it might need to be an index/number. 
 
 The parent component needs to explicitly allow the child component to change its state by passing an event handler down as a prop:
 <>
