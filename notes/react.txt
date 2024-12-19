@@ -37,7 +37,8 @@ There are different kinds of React components:
 JSX is a syntax extension for JavaScript that lets you write HTML-like markup inside a JavaScript file. It’s NOT required to use JSX when writing React components, but it does make writing them more concise.
 JSX is syntactic sugar for the React createElement function. JSX compiles down to plain JavaScript objects.
 - Rules of JSX:
-1. Return a sinlge root elementfunction App() {
+1. Return a single root element 
+function App() {
   // Could replace <></> with <div></div>
   return (
     <> // this is called a React Fragment - single element
@@ -107,7 +108,7 @@ function App() {
     <div>
       <h1>Animals: </h1>
       <ul>
-        {animals.map((animal) => { // this can take a list however logn we want and render it all as a list
+        {animals.map((animal) => { // this can take a list however long we want and render it all as a list
           return <li key={animal}>{animal}</li>;
         })}
       </ul>
@@ -128,7 +129,7 @@ function App() {
     </div>
   );
 }
-----------------------
+---------------------- 
 
 function ListItem(props) {
   return <li>{props.animal}</li>
@@ -422,7 +423,7 @@ Keys are special props for components. Props are arguments passed into react com
 Now imagine, if any of the items in the list on the DOM were to change, how would React know which item to update?
 If the list were to change, one of two things should happen:
 - we completely re-render the entire list, or
-- we hunt down the specific items that were changed and only re-render those. (we assume this because it's not as costly in memory - therefore we need keys). Whenever a list is updated React mataches the keys of each of the previous list items to the updated list. If there are changes, React only updates the items that have changed. 
+- we hunt down the specific items that were changed and only re-render those. (we assume this because it's not as costly in memory - therefore we need keys). Whenever a list is updated React matches the keys of each of the previous list items to the updated list. If there are changes, React only updates the items that have changed. 
 <Component key={keyValue} />
 //or
 <div key={keyValue} />
@@ -470,7 +471,8 @@ const listItems = people.map(person =>
     <p>{person.bio}</p>
   </Fragment>
 );
-Fragments disappear from the DOM, so this will produce a flat list of <h1>, <p>, <h1>, <p>, and so on.
+Fragments disappear from the DOM, so this will produce a flat list of <h1>, <p>, <h1>, <p>, and so on. 
+
 
 Rules of keys:
 Keys must be unique among siblings. However, it’s okay to use the same keys for JSX nodes in different arrays.
@@ -804,7 +806,7 @@ function App() {
 
 To update a component with new data, two things need to happen:
 - Retain the data between renders.
-- Trigger React to render the component with new data (re-rendering).
+- Trigger React to render the component with new data (re-rendering). -- ANKI
 
 The useState hook is a built-in hook in React that allows you to define state in a functional component. 
 It takes an initial value as a parameter and returns an array with two elements that we can destructure to get:
@@ -900,7 +902,7 @@ root.render(<Image />);
 Otherwise, you can encounter confusing bugs and unpredictable behavior as your codebase grows in complexity. 
 When developing in “Strict Mode”, React calls each component’s function twice, which can help surface mistakes 
 caused by impure functions.
-- Committing to the DOM (placing the order on the table)
+-  Committing to the DOM (placing the order on the table)
 1. For the initial render, React will use the appendChild() DOM API to put all the DOM nodes it has created on screen.
 2. For re-renders, React will apply the minimal necessary operations (calculated while rendering!) to make the DOM match 
 the latest rendering output.
@@ -1140,7 +1142,7 @@ const handleIncreaseAge = () => { // passing in the previous person to update th
 * Because there are two setState calls, you would think React re-renders the component twice, right? 
 NOPE! Wherever possible, React *batches the state updates*. Here, the component only re-renders once. 
 
-### State Reducer Function -  useReducer ###
+### State Reducer Function - useReducer ### // DID NOT MAKE FLASHCARD FOR THIS
 Components with many state updates spread across many event handlers can get overwhelming. For these cases, 
 you can consolidate all the state update logic outside your component in a single function, called “reducer”. 
 Your event handlers become concise because they only specify the user “actions”. 
@@ -1220,7 +1222,7 @@ const initialTasks = [
   { id: 2, text: 'Lennon Wall pic', done: false }
 ];
 
-### useContext ###
+### useContext ### // DID NOT MAKE FLASHCARD FOR THIS
 
 import React, { createContext, useContext } from "react";
 // Create a Context for the level
