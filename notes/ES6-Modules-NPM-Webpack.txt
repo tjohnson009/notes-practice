@@ -278,7 +278,7 @@ an instance of it by calling it with the new operator.
 Mode:
 By setting the mode parameter to either development, production or none, you can enable webpack's built-in optimizations that correspond to each 
 environment. The default value is production.
-Browser Compatibility:
+Browser Compatibility: 
 Webpack supports all browsers that are ES5-compliant (IE8 and below are not supported). Webpack needs Promise for import() and require.ensure(). 
 If you want to support older browsers, you will need to load a polyfill before using these expressions.
 
@@ -376,9 +376,13 @@ import data from './data.json';
 import { foo } from './data.json';
 
 ## BASIC FLOW OF SETTING THINGS UP WITH WEBPACK ##
-- Create or get the files and place them in the src folder 
-- npm install the loaders, plugins or tools as dev dependencies 
-- Update your webpack config file with something like this: 
+1. Organize Files: Place source files in the src folder.
+2. Install Dependencies: Use npm install to add loaders, plugins, or tools as dev dependencies.
+3. Configure Webpack: Update webpack.config.js with the necessary loaders and rules. Example:
+
+module.exports = {
+  module: {
+    rules: [
       {
         test: /\.(csv|tsv)$/i,
         use: ['csv-loader'],
@@ -387,9 +391,14 @@ import { foo } from './data.json';
         test: /\.xml$/i,
         use: ['xml-loader'],
       },
-- import the modules into your index.js file 
-- do what you need to with the data and files in your code 
-- npm run build to let webpack do what it needs to do
+    ],
+  },
+};
+4.  Import Modules: Import the files or data in src/index.js.
+5. Write Code: Use the imported modules as needed in your application.
+6.  Build Project: Run npm run build to generate the final output with Webpack.
+
+
 
 The coolest part of everything mentioned above, is that loading assets this way allows you to group modules and 
 assets in a more intuitive way. Instead of relying on a global /assets directory that contains everything, you 
@@ -597,6 +606,7 @@ webpack config
 }
 
 _______________________________________________________________________
+
 ## OUTPUT MANAGEMENT ##
  <!DOCTYPE html>
  <html>
@@ -823,3 +833,5 @@ those files to GitHub. This is because the package.json file contains all the in
 and install them on their machine with npm install.
 You can make a .gitignore file in the root of the project, and by writing file or directory names in it, you can tell git what 
 things you don’t want to track. It’s customary to add node_modules to .gitignore, since it can get really big. 
+
+--- ANKI

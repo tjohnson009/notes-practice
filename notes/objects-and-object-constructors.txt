@@ -8,7 +8,7 @@ const variable = 'property';
     function Player(name, marker) {
      this.name = name;
      this.marker = marker;
-}
+}Arrow functions do not have their own this and inherit this from the nearest enclosing non-arrow function. 
 
 const player = new Player('steve', 'X');
 console.log(player.name); // 'steve'

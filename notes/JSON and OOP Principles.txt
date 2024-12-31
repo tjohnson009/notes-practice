@@ -185,8 +185,7 @@ and then add in a bunch of DOM functions later without touching the game logic.
 
 ------------------------------- SOLID Principles
 1. Single responsibility
-- The single responsibility principle says that a class or module should have only a single purpose. For example, if you have a wallet 
- class, that class should only implement wallet functionality. It’s fine to call other functionality, but it shouldn’t be written there.
+- The single responsibility principle says that a class or module should have only a single purpose. For example, if you have a wallet class, that class should only implement wallet functionality. It’s fine to call other functionality, but it shouldn’t be written there.
 - A class should have one and only one reason to change, meaning that a class should only have one job.
 
 class Car {
@@ -232,13 +231,11 @@ class Car {
     }
 }
 
-The Car class can be changed, moved around or even deleted without affecting the logger class. Likewise, if a change is required to the logger class, it
- only needs to be carried out in a single place.
+The Car class can be changed, moved around or even deleted without affecting the logger class. Likewise, if a change is required to the logger class, it only needs to be carried out in a single place.
  ------
 
 2. Open-closed
-- The open-closed principle says that code should be open for extension, but closed for modification. What this means is that if we want 
-to add additional functionality, we should be able to do so simply by extending the original functionality, without the need to modify it.
+- The open-closed principle says that code should be open for extension, but closed for modification. What this means is that if we want to add additional functionality, we should be able to do so simply by extending the original functionality, without the need to modify it.
 BAD EXAMPLE
 class Vehicle {
     constructor(fuelCapacity, fuelEfficiency) {
@@ -382,7 +379,7 @@ types of data? Or perhaps it wants us to “stage” a payment first, and then t
 That’s bad, and so we need to abstract the functionality out instead.
 -class PurchaseHandler {
     processPayment(paymentDetails, amount) {
-        const paymentSuccess = PaymentHandler.requestPayment( // create another clas to handle whatever system we use or switch to
+        const paymentSuccess = PaymentHandler.requestPayment( // create another class to handle whatever system we use or switch to
             paymentDetails,
             amount
         );

@@ -133,7 +133,7 @@ alert(sumSalaries(company)); // 7700
 
 We can easily see the principle: for an object {...} subcalls are made, while arrays [...] are the “leaves” of the recursion tree, they give immediate result.
 
-## Linked List:
+## Linked List: 
 There’s a big problem with arrays... The “delete element” and “insert element” operations are expensive. 
 For instance, arr.unshift(obj) operation has to renumber all elements to make room for a new obj, and if the array is big, it takes time. Same with arr.shift().
 If we really need fast insertion/deletion, we can choose another data structure called a LINKED LIST.
@@ -323,7 +323,7 @@ Here, the recursive call sumTailRecursive(n-1, accu + n) is the last operation, 
 
 
 # MERGE SORT #
- - the main idea is to sort smaller arrays and combine those arrays into the correct order
+ - The main idea is to sort smaller arrays and combine those arrays into the correct order. 
  - the most complicated type of sort in CS50
  - Sort the left, sort the right, merge the sorted halves together. 
  Merge Sort is just these 3 steps recursively. Dividing and Conquering
@@ -357,7 +357,7 @@ bn = p
     `2
 
 
-# TIME COMPLEXITY #
+# TIME COMPLEXITY #  
 In programming, there are two ways we can measure the efficiency of our code. We can measure the time complexity or the space complexity. It’s important to understand that you never measure the efficiency of an algorithm by how long it takes to execute.
 
 The way to measure code efficiency is to evaluate how many ‘steps’ it takes to complete. A 5 step program will always run faster than a 20 step program. Steps are key. 
@@ -399,7 +399,7 @@ Omega Notation isn’t considered as useful because it is unlikely our item will
 When we talk about memory, we mean primary memory, which is the working memory available to your system to execute algorithms. Primary memory is a segment of computer memory that can be accessed directly by the processor and is the part of the computer that stores current data, programs, and instructions. . In a hierarchy of memory, primary memory has access time less than secondary memory and greater than cache memory. 
 
 Anyways:
-Space complexity can be considered to be the total space used by an algorithm relative to the size of the input. Measuring space complexity considers the space used by your algorithm input and auxiliary space. Auxiliary space is the extra space used by the algorithm. It is the total amount of working memory our algorithm needs.
+Space complexity can be considered to be the total space used by an algorithm relative to the size of the input. Measuring space complexity considers the space used by your algorithm input and auxiliary space. Auxiliary space is the extra space used by the algorithm. It is the total amount of working memory our algorithm needs. 
 
 The first thing to know is that, like time complexity, we measure space complexity by considering all steps including any constants, and then we drop the constants when applying a Big O Notation to the algorithm.
 Most data structures you come across will have a space complexity of O(N). That makes sense - when you increase the number of items in your data structure, it increases the space that data structure occupies in a linear way.
@@ -448,18 +448,19 @@ In summary, data structures are essential tools in computer science that help or
 
 - Linear Search Algorithm: searching names one by one by last name - "Aaron? no. Abel? no. Abraham? no. etc"; Tens of thhousands of comparisons until you find the right name. The process of going start to finish through a list and comparing values. This is brute force. 
 - Chunking Search Algorithm: The process of chunking involves first finding the general area where an entry would be, then proceeding to check every entry. This way is suboptimal.
-- Binary Search Algorithm: split the phonebook is half and determine whifh half the entry you're looking for is on, then throw away the other half. Repeat until the entry is found. Divide and conquer; THE DATA MUST BE SORTED FOR THIS TO WORK
-log2(400) = 8.64385618977, which means that in the worst cas e rounding up, it would take 9 comparisons.
+- Binary Search Algorithm: split the phonebook is half and determine which half the entry you're looking for is on, then throw away the other half. Repeat until the entry is found. Divide and conquer; THE DATA MUST BE SORTED FOR THIS TO WORK
+log2(400) = 8.64385618977, which means that in the worst case rounding up, it would take 9 comparisons.
 What about 4,000,000 pages? log2(4,000,000) = 21.9315685693, which means it would take at most 22 comparisons.
 
 In order to to use BFS or DFS you have to understand and implement certain concepts first. Without them, it's like trying to fix something without the proper tools. 
+
 ## Queues
 You can find a great example of a queue simply by thinking about a typical experience at a deli. When you get in line, you pull a number and wait for your number to be called. Everyone who pulled a number before you will be given service before you, but when you’re the customer who has been in line the longest, your number will be called next. Queues are FIFO - First In, First Out
 Queues have 2 properties:
 - Enqueue is when you “start waiting.” It’s the equivalent of pulling a number in the deli example.
 - Dequeue is when it’s your turn to be served. It’s the equivalent of having your number called at the deli.
 
-It's NECESSARY to have 2 different pointers in the queue that point to the front of the queue and the back of the queue. The queue is "full" when the 'back' pointer is is directly to the left of the 'front' pointer. We can cycle our pointers throughout opur structure by using the modulo operator. So our back pointer can technically be in front of our front pointer. 
+It's NECESSARY to have 2 different pointers in the queue that point to the front of the queue and the back of the queue. The queue is "full" when the 'back' pointer is is directly to the left of the 'front' pointer. We can cycle our pointers throughout our structure by using the modulo operator. So our back pointer can technically be in front of our front pointer. 
 Next Pointer position = (pointer + 1) % length of queue/array
 Example:
 A queue of length of 5. We move the end pointer to the back and then there are no more spaces. 
@@ -468,13 +469,13 @@ next pointer position = ([4] + 1) % 5 ==> 5 % 5 ==> 0 so the next position for t
 ## Stacks
 This is like a stack of books. If you want to add something to thhe stack, it goes on top of the stack. You can only add to the top or remove from the top. Stacks are LIFO - last in, first out. Sorted by insertion order, elements are not indexed. Middle items cannot be accessed directly in stacks of queues
 
-# BINARY SEARCH TREES:
+# BINARY SEARCH TREES: 
 Binary search trees (BSTs) are a special type of tree data structure where each node has at most two children, referred to as the left and right child. In a BST, for any given node, all elements in its left subtree are smaller than the node, and all elements in its right subtree are larger. This property makes BSTs efficient for searching, inserting, and deleting elements, typically with an average time complexity of O(log n) for these operations.
 
 To construct a BST from an array, you start with an empty tree and insert each element of the array one by one. For each insertion, you compare the new element with the root. If it's smaller, you move to the left child; if larger, you move to the right child. You continue this process until you find an empty spot to insert the new node. Traversing a BST can be done in several ways: in-order (left subtree, root, right subtree), pre-order (root, left subtree, right subtree), or post-order (left subtree, right subtree, root). In-order traversal of a BST yields the elements in sorted order, which is a useful property for many applications. 
 
 ## BINARY TREE TRAVERSAL
-Whhen working with trees, we usuaully want to visit each of the nodes in the tree. Tree traversal is the process of visiting each node exactly one time in some order. Visiting the nodes involves reading/processing thhe data in the node. Binary search trees are composed of nodes. Each node has up to two direct children. In whhat order should we visit the nodes? We can either go breadth first or depth first. 
+Whhen working with trees, we usually want to visit each of the nodes in the tree. Tree traversal is the process of visiting each node exactly one time in some order. Visiting the nodes involves reading/processing thhe data in the node. Binary search trees are composed of nodes. Each node has up to two direct children. In what order should we visit the nodes? We can either go breadth first or depth first. 
 Breadth first - visit all the nodes on the same level before continuing on to other levels. The root is level 0. This is also called to level order traversal - we traverse level by level. Here we visit all the child nodes before the grandchildren. 
 Depth first - visit all the child and grandchild nodes before going to the next child and grandchild set. AKA visit the left node and then all the children and grandchildren of the left node, then go on to the right node. There can be differences in how we visit the left subtree and thhe right subtree:
 Left, Root, Right OR Right, Root, Left OR ...
@@ -501,7 +502,7 @@ The Time Complexity - O(n)
 The Space Complexity - O(n) is the worst case and the average case
 ### DEPTH FIRST TRAVERSAL - PreOrder, InOrder, PostOrder
 If we go in any direction in DFS, we visit the complete subtree in that direction. The subtrees are visited in the same order
-as all the nodes in the original  subtree. How do we writw this functionally?
+as all the nodes in the original  subtree. How do we write this functionally?
 Node are like objects that have 3 properties: data, address/location of the left node, address/location of the right node
 PreOrder:
 BASE CASE: if the root is null, return
@@ -568,7 +569,7 @@ function hash(name, surname) {
 * Hash codes need to be numbers. Those numbers will serve as the indexes to the buckets we will keep our key value pair in. 
 * Rules for choosing good hash function:
 1. The hash function should be simple to compute.
-2. Number of collisions should be less while placing the record in the hash table.Ideally no collision should occur. Such a function is called perfect hash function.
+2. Number of collisions should be less while placing the record in the hash table. Ideally no collision should occur. Such a function is called perfect hash function.
 3. Hash function should produce such keys which will get distributed uniformly over an array.
 4. The hash function should depend on every bit of the key. Thus the hash function that simply extracts the portion of a key is not suitable.
 

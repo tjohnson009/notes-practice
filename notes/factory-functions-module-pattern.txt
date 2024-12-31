@@ -102,11 +102,8 @@ the outer function is done running, it will still maintain that variable in memo
 
 One of the key arguments against constructors, in fact, the biggest argument is how they look like regular JavaScript functions, 
 even though they do not behave like regular functions. If you try to use a constructor function without the new keyword, not only 
-does your program fail to work, but it also produces error messages that are hard to track down and understand. This and other problems
-led to the use of Factory Functions. 
-Yet another issue stems from the way the instanceof works. It checks the presence of a constructor’s prototype in an object’s entire prototype chain 
-- which does nothing to confirm if an object was made with that constructor since the constructor’s prototype can even be reassigned after the creation 
-of an object.
+does your program fail to work, but it also produces error messages that are hard to track down and understand. This and other problems led to the use of Factory Functions. 
+Yet another issue stems from the way the instanceof works. It checks the presence of a constructor’s prototype in an object’s entire prototype chain - which does nothing to confirm if an object was made with that constructor since the constructor’s prototype can even be reassigned after the creation of an object.
 
 Examples:
 function createGreeting(greeting = "") {
@@ -238,8 +235,7 @@ console.log({
 });
 // logs { discordName: "@josh", reputation: 2 }
 
-Notice that the object we return in the factory function does not contain the 
-reputation variable itself, nor any copy of its value - it can only be accessed via the closures we defined.
+Notice that the object we return in the factory function does not contain the reputation variable itself, nor any copy of its value - it can only be accessed via the closures we defined.
 
 Concerning factory functions, a private variable or function uses closures to create
  smaller, dedicated variables and functions within a factory function itself - things 
@@ -278,8 +274,7 @@ explicitly return that variable or as we did in this example, by putting it into
   return { name, getReputation, giveReputation, increaseLevel };
 }
 
-You can create your User, extract what you need from it, and re-return whatever you want to 
-- hiding the rest as some private variables or functions!
+You can create your User, extract what you need from it, and re-return whatever you want to - hiding the rest as some private variables or functions!
 Another way if you only wanted to extend User instead of only using some properties. 
 function createPlayer (name, level) {
   const user = createUser(name);

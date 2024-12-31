@@ -1,5 +1,5 @@
 ## Callbacks ##
-These were what were used mostly in the past when dealign with asynchronous code.
+These were what were used mostly in the past when dealing with asynchronous code.
 A callback function is a function passed into another function as an argument, which is then invoked inside the outer function to complete some kind of routine or action. Callbacks are functions that get passed into other functions. Think about event listeners. 
 
 myDiv.addEventListener("click", function(){
@@ -322,9 +322,9 @@ let promise = getWeather().then(resolve, reject)
 ## Event Loop ##:
 How does JS even work? 
 The Call Stack: one thread == one call stack == one thing at a time
-The call stack calls function when they are on thhe stack and when the function returns, we pop them off the call stack. 
-What is blocking? What happens when things are slow? They block other tasks that are on the stack. Thid is a problem because of browsers. EWhile we wait for these syynchronous tasks, we cannot do anything else in the browser. 
-Enter ashynchronous callbacks. 
+The call stack calls function when they are on the stack and when the function returns, we pop them off the call stack. 
+What is blocking? What happens when things are slow? They block other tasks that are on the stack. This is a problem because of browsers. While we wait for these synchronous tasks, we cannot do anything else in the browser. 
+Enter asynchronous callbacks. 
 
 CONCURRENCY and the Event Loop - one thing at a time, except not really. 
 The browser is more than just the runtime. It also includes the webAPIs, the callback/task queue, and the event loop. 
@@ -398,7 +398,7 @@ While we are pushing this API key to the frontend, this isn’t something you sh
 
 ## FETCH API ##
 Fetch is the modern replacement for XMLHttpRequest: unlike XMLHttpRequest, which uses callbacks, Fetch is promise-based and is integrated with features of the modern web such as service workers and Cross-Origin Resource Sharing (CORS).
-.fetch is available as a global function in both thhe window and worker contexts. You pass it a Request object or a string containing the URL to fetch, along with an optional argument to configure the request.
+.fetch is available as a global function in both the window and worker contexts. You pass it a Request object or a string containing the URL to fetch, along with an optional argument to configure the request.
 
 async function getData() {
   const url = "https://example.org/products.json";
@@ -744,7 +744,7 @@ P.S. The task is technically very simple, but the question is quite common for d
 
 * solution:
 That’s the case when knowing how it works inside is helpful.
-Just treat async call as promise and attach .then to it:
+Just treat the async call as a promise and attach .then to it:
 - async function wait() {
   await new Promise(resolve => setTimeout(resolve, 1000));
   return 10;
