@@ -1412,8 +1412,68 @@ export default function Gallery() {
     </>
   );
 }
-
 -- ANKI
+
+# useEffect #
+Sometimes components in React need to interact with things outside themselves. This interaction with the outside world is called a SIDE-EFFECT.
+Effects let you run some code to synchronize your component as necessary, on rendering or a reactive/state value change rather than on a particular event. 
+useEffect is a mechanism outside the concepts that React usually applies, allowing you to sync your component with various external systems like a server, API, or browser DOM. The single question that you can ask yourself before you use an effect is if there are any such external systems that need to be synced with, apart from props or state. Unnecessary useEffects are error prone and slow down performance. 
+
+3 Parts for the useEffect Hook:
+1. The Hook
+2. The Dependency array
+
+When we use useEffect we move it outside the rendering calculation. 
+
+By default, useEffect hook runs on every render. the second argument accepts an array of dependencies allowing the hook to re-render only when those dependencies are changed.
+We pass an empty array in this example because we do not want the useEffect hook to run anytime other than the initial component render.
+Passing an empty array causes the useEffect hook to onnly run once because there is nothing in the dependency array. 
+3. The Cleanup Function - You can return a function from the callback in the useEffect hook, which will be executed each time before the next effect is run, and one final time when the component is unmounted.
+
+import { useEffect, useState } from "react";
+
+export default function Clock() {
+  const [counter, setCounter] = useState(0);
+  useEffect(() => {
+    const key = setInterval(() => {
+      setCounter(count => count + 1)
+    }, 1000);
+    return () => {
+      clearInterval(key);
+    };
+  }, [])
+  return (
+    <p>{counter} seconds have passed.</p>
+  );
+}
+
+
+EXAMPLES: 
+useEffect(() => {
+  // This runs after every render
+});
+
+useEffect(() => {
+  // This runs only on mount (when the component appears)
+}, []);
+
+useEffect(() => {
+  // This runs on mount *and also* if either a or b have changed since the last render
+}, [a, b]);
+
+*** SUMMARY OF useEffect: ***
+useEffect(
+  () => {
+    // execute side effect
+    return () => {
+      // cleanup function on unmounting or re-running effect
+    }
+  },
+  // optional dependency array
+  [/* 0 or more entries */]
+)
+
+
 
 
 
