@@ -1417,7 +1417,8 @@ export default function Gallery() {
 # useEffect #
 Sometimes components in React need to interact with things outside themselves. This interaction with the outside world is called a SIDE-EFFECT.
 Effects let you run some code to synchronize your component as necessary, on rendering or a reactive/state value change rather than on a particular event. 
-useEffect is a mechanism outside the concepts that React usually applies, allowing you to sync your component with various external systems like a server, API, or browser DOM. The single question that you can ask yourself before you use an effect is if there are any such external systems that need to be synced with, apart from props or state. Unnecessary useEffects are error prone and slow down performance. 
+useEffect is a mechanism outside the concepts that React usually applies, allowing you to sync your component with various external systems like a server, API, or browser DOM. 
+The single question that you can ask yourself before you use an effect is if there are any such external systems that need to be synced with, apart from props or state. Unnecessary useEffects are error prone and slow down performance. 
 
 3 Parts for the useEffect Hook:
 1. The Hook
@@ -1472,6 +1473,23 @@ useEffect(
   // optional dependency array
   [/* 0 or more entries */]
 )
+
+*** Do NOT NEED useEffect here ***
+1. If you are only calculating something based on the state during rendering. 
+  import { useState } from "react";
+  export default function AdditionDisplay() {
+    const [number1, setNumber1] = useState(0);
+    const [number2, setNumber2] = useState(0);
+    // This is all unnecessary...
+    // const [sum, setSum] = useState(0);
+    // useEffect(() => {
+    //   setSum(number1 + number2);
+    // }, [number1, number2]);
+    const sum = number1 + number2;
+    return (
+      <p>{number1} + {number2} = {sum}</p>
+    );
+  } // This is similar to redundant state
 
 
 
